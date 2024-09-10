@@ -6,11 +6,16 @@
   "author": "GenerelSchwerz",
   "license": "MIT",
   "devDependencies": {
-    "mineflayer": "^4.20.1",
     "tsc": "^2.0.4",
-    "typescript": "^5.6.2"
+    "typescript": "^5.6.2",
+    "mineflayer-viaproxy": "file:./"
   },
   "dependencies": {
-    "debug": "^4.3.7"
+    "debug": "^4.3.7",
+    "mineflayer": "^4.20.1"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "node examples/test.js"
   }
 }

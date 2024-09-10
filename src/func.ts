@@ -11,7 +11,7 @@ const debug = require("debug")("mineflayer-viaproxy");
 
 const VIA_PROXY_CMD = (loc : string) => "java -jar " + loc + " cli";
 
-async function createBot(options: BotOptions & ViaProxyOpts) {
+export async function createBot(options: BotOptions & ViaProxyOpts) {
 
 
   const test = await ping({
@@ -61,6 +61,7 @@ async function createBot(options: BotOptions & ViaProxyOpts) {
 
     const viaProxy = spawn(cmd, { shell: true });
 
+    // added for robustness, just to be sure.
     process.on("beforeExit", cleanupProxy);
 
     await new Promise<void>((resolve, reject) => {
@@ -90,7 +91,7 @@ async function createBot(options: BotOptions & ViaProxyOpts) {
       viaProxy!.stderr.on("data", stdErrListener);
     });
 
-    bot.viaProxy
+    bot.viaProxy = viaProxy
   } else {
     // perform current bot setup.
     bot = orgCreateBot(options);
