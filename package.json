@@ -1,6 +1,6 @@
 {
   "name": "mineflayer-viaproxy",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "ViaProxy support for mineflayer.",
   "main": "dist/index.js",
   "author": "GenerelSchwerz",
