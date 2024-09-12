@@ -7,6 +7,9 @@ A mineflayer plugin that allows you to connect to a server through a ViaVersion 
 
 Why? Because I'm tired of people asking for version updates.
 
+If you have issues, join [here](https://discord.gg/g3w4G88y) for support. 
+Alternatively, [here](https://discord.gg/prismarinejs-413438066984747026) for general mineflayer support.
+
 ### TODOS
 - [x] Support bedrock versions
 - [x] Support adding accounts to ViaProxy gracefully.
