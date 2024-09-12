@@ -8,7 +8,7 @@ const {createBot, AuthType, openViaProxyGUI } = require('../');
         port: parseInt(process.argv[3]),
         username: process.argv[4] ?? "viaproxytest",
         bedrock: true,
-        autoUpdate: false,
+        autoUpdate: false, // skips auto-updating the client
         localAuth: AuthType.ACCOUNT // most bedrock accounts require an xbox account.
     })
 
