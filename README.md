@@ -9,7 +9,7 @@ Why? Because I'm tired of people asking for version updates.
 
 ## TODOS
 - [x] Support bedrock versions
-- [ ] Support adding accounts to ViaProxy gracefully.
+- [x] Support adding accounts to ViaProxy gracefully.
 - [ ] Make fix for prismarine-registry more robust (see patches) 
 - [ ] Add support for more ViaVersion options
 - [ ] Add support for more ViaProxy options

@@ -4,7 +4,7 @@ import { Bot } from "mineflayer";
 import { BASE_VIAPROXY_URL, BASE_GEYSER_URL, VIA_PROXY_CMD } from "./constants";
 import { exec } from "child_process";
 
-import jsyaml from "js-yaml"
+import jsyaml from "js-yaml";
 
 const debug = require("debug")("mineflayer-viaproxy");
 
@@ -212,7 +212,7 @@ export async function verifyGeyserLoc(pluginDir: string, autoUpdate = true, loca
       }
     }
 
-    debug(`Downloading Geyser jar at ${pluginDir}`)
+    debug(`Downloading Geyser jar at ${pluginDir}`);
     const jar = await fetchGeyserJar(pluginDir, version, filename);
     if (!jar) throw new Error("Failed to fetch Geyser jar.");
     return jar;
@@ -238,23 +238,23 @@ export async function checkJavaVersion(): Promise<number> {
 }
 
 export async function openViaProxyGUI(fullpath: string, cwd: string) {
+  console.log("opening ViaProxy");
 
-  const test = exec(VIA_PROXY_CMD(fullpath), {cwd: cwd});
-  
+  const test = exec(VIA_PROXY_CMD(fullpath, false), { cwd: cwd });
+
   await new Promise<void>((resolve, reject) => {
-    test.on('close', (code) => {
+    test.on("close", (code) => {
       resolve();
     });
 
-    test.on('error', (err) => {
+    test.on("error", (err) => {
       reject(err);
     });
 
-    test.on('exit', (code) => {
+    test.on("exit", (code) => {
       resolve();
-    });    
-  })
-
+    });
+  });
 }
 
 export function loadProxySaves(cwd: string) {
@@ -262,25 +262,95 @@ export function loadProxySaves(cwd: string) {
   if (!existsSync(loc)) throw new Error("No saves found.");
 
   return JSON.parse(readFileSync(loc, "utf-8"));
+}
 
+export async function identifyAccount(username: string, bedrock: boolean, location: string, wantedCwd: string, depth = 0): Promise<number> {
+  const saves = loadProxySaves(wantedCwd);
+  const accountTypes = Object.keys(saves).filter((k) => k.startsWith("account"));
+  const newestAccounts = accountTypes.map((k) => parseInt(k.split("V")[1])).sort((a, b) => a - b);
+  const newestKey = newestAccounts[newestAccounts.length - 1];
+
+  switch (newestKey) {
+    case 3: {
+      const accounts = saves[`accountsV${newestKey}`];
+
+      if (accounts.length === 0) {
+        throw new Error("No accounts found.");
+      }
+
+      if (bedrock) {
+        const bdAccs = accounts.filter((a: any) => a.accountType.includes("Bedrock"));
+        if (bdAccs.length === 0) {
+          if (depth >= 1) {
+            throw new Error("No bedrock accounts found (even after opening GUI).");
+          }
+          await openViaProxyGUI(location, wantedCwd);
+          return await identifyAccount(username, bedrock, location, wantedCwd, depth + 1);
+        }
+
+        const matchName = bdAccs.find((a: any) => a.bedrockSession.mcChain.displayName === username);
+
+        if (matchName == null) {
+          if (depth >= 1) {
+            throw new Error(
+              `No Bedrock account saved with the account name ${username}.\nOptions: ${bdAccs
+                .map((a: any) => a.bedrockSession.mcChain.displayName)
+                .join(", ")}`
+            );
+          }
+
+          await openViaProxyGUI(location, wantedCwd);
+          return await identifyAccount(username, bedrock, location, wantedCwd, depth + 1);
+        }
+
+        const idx = accounts.indexOf(matchName);
+        return idx;
+      } else {
+        const msAccs = accounts.filter((a: any) => a.accountType.includes("Microsoft"));
+        if (msAccs.length === 0) {
+          if (depth >= 1) {
+            throw new Error("No Microsoft accounts found.");
+          }
+          await openViaProxyGUI(location, wantedCwd);
+          return await identifyAccount(username, bedrock, location, wantedCwd, depth + 1);
+        }
+
+        const matchName = msAccs.find((a: any) => a.javaSession.mcProfile.name === username);
+
+        if (matchName == null) {
+          if (depth >= 1) {
+            throw new Error(
+              `No Microsoft account saved with the account name ${username}.\nOptions: ${msAccs
+                .map((a: any) => a.javaSession.mcProfile.name)
+                .join(", ")}`
+            );
+          }
+          await openViaProxyGUI(location, wantedCwd);
+          return await identifyAccount(username, bedrock, location, wantedCwd, depth + 1);
+        }
+
+        const idx = accounts.indexOf(matchName);
+        return idx;
+      }
+    }
+    default:
+      throw new Error(`Unsupported account version: ${newestKey}.`);
+  }
 }
 
 export function configureGeyserConfig(pluginDir: string, localPort: number) {
   const configPath = join(pluginDir, "Geyser/config.yml");
-
 
   if (!existsSync(configPath)) {
     throw new Error("Geyser config not found.");
   }
 
   const config = readFileSync(configPath, "utf-8");
-  const parsed = jsyaml.load(config) as any
+  const parsed = jsyaml.load(config) as any;
 
   parsed["bedrock"]["port"] = localPort;
 
   // write back to file.
   const newConfig = jsyaml.dump(parsed);
   writeFileSync(configPath, newConfig);
-
-
 }

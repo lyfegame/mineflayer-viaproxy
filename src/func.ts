@@ -5,7 +5,16 @@ import { supportedVersions } from "minecraft-data";
 import { spawn } from "child_process";
 import { AuthType, ViaProxyOpts } from "./types";
 import { openAuthLogin } from "./openAuthMod";
-import { configureGeyserConfig, fetchViaProxyJar, findOpenPort, loadProxySaves, verifyGeyserLoc, verifyViaProxyLoc } from "./utils";
+import {
+  configureGeyserConfig,
+  fetchViaProxyJar,
+  findOpenPort,
+  identifyAccount,
+  loadProxySaves,
+  openViaProxyGUI,
+  verifyGeyserLoc,
+  verifyViaProxyLoc,
+} from "./utils";
 import path from "path";
 import { existsSync, mkdir, mkdirSync } from "fs";
 
@@ -17,7 +26,9 @@ const debug = require("debug")("mineflayer-viaproxy");
 export async function createBot(options: BotOptions & ViaProxyOpts) {
   let ver: string;
 
-  if (options.bedrock) {
+  const bedrock = options.bedrock ?? false;
+
+  if (bedrock) {
     if (options.host == null || options.port == null) throw new Error("Host and port must be provided for bedrock edition.");
     const test = await bdPing({
       host: options.host, // external host
@@ -39,7 +50,7 @@ export async function createBot(options: BotOptions & ViaProxyOpts) {
 
   let bot!: Bot;
 
-  if (options.bedrock || !supportedVersions.pc.includes(ver)) {
+  if (bedrock || !supportedVersions.pc.includes(ver)) {
     const cleanupProxy = () => {
       if (bot != null && bot.viaProxy != null && !bot.viaProxy.killed) {
         bot.viaProxy.kill();
@@ -75,63 +86,8 @@ export async function createBot(options: BotOptions & ViaProxyOpts) {
     if (auth !== AuthType.ACCOUNT) newOpts.auth = "offline";
     else {
       newOpts.auth = "offline";
-      const saves = loadProxySaves(wantedCwd);
-      const accountTypes = Object.keys(saves).filter((k) => k.startsWith("account"));
-      const newestAccounts = accountTypes.map((k) => parseInt(k.split("V")[1])).sort((a, b) => a - b);
-      const newestKey = newestAccounts[newestAccounts.length - 1];
-
-      switch (newestKey) {
-        case 3: {
-          const accounts = saves[`accountsV${newestKey}`];
-
-          if (accounts.length === 0) {
-            throw new Error("No accounts found.");
-          }
-    
-          if (options.bedrock) {
-            const bdAccs = accounts.filter((a: any) => a.accountType.includes("Bedrock"));
-            if (bdAccs.length === 0) {
-              throw new Error("No bedrock accounts found.");
-            }
-    
-            const matchName = bdAccs.find((a: any) => a.bedrockSession.mcChain.displayName === options.username);
-    
-            if (matchName == null) {
-              throw new Error(
-                `No Bedrock account saved with the account name ${options.username}.\nOptions: ${bdAccs
-                  .map((a: any) => a.bedrockSession.mcChain.displayName)
-                  .join(", ")}`
-              );
-            }
-    
-            const idx = accounts.indexOf(matchName);
-            cmd = cmd + " --minecraft-account-index" + ` ${idx}`;
-          } else {
-            const msAccs = accounts.filter((a: any) => a.accountType.includes("Microsoft"));
-            if (msAccs.length === 0) {
-              throw new Error("No Microsoft accounts found.");
-            }
-    
-            const matchName = msAccs.find((a: any) => a.javaSession.mcProfile.name === options.username);
-    
-            if (matchName == null) {
-              throw new Error(
-                `No Microsoft account saved with the account name ${options.username}.\nOptions: ${msAccs
-                  .map((a: any) => a.javaSession.mcProfile.name)
-                  .join(", ")}`
-              );
-            }
-    
-            const idx = accounts.indexOf(matchName);
-            cmd = cmd + " --minecraft-account-index" + ` ${idx}`;
-          }
-        }
-
-        default:
-          throw new Error(`Unsupported account version: ${newestKey}.`);
-
-      }
-     
+      const idx = await identifyAccount(options.username, bedrock, location, wantedCwd);
+      cmd = cmd + " --minecraft-account-index" + ` ${idx}`;
     }
 
     debug(`Launching ViaProxy with cmd: ${cmd}`);
