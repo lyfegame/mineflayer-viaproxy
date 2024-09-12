@@ -26,12 +26,10 @@ const orgBotOpts = {...}
 const viaProxyOpts = {...}
 
 // same object. 
-const bot = await createBot({...orgBotOpts, ...viaProxyOpts})
-```
-
-// do everything else as normal, just import our createBot.
+const bot = await createBot({...orgBotOpts, ...viaProxyOpts});
 
 ```
+
 ## API
 
 <!-- export enum AuthType {
