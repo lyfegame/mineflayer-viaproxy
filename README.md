@@ -54,10 +54,12 @@ enum AuthType {
 #### `ViaProxyOpts`
 
 ```ts
-interface ViaProxyOpts {
+export interface ViaProxyOpts {
     localPort?: number;
-    localAuth?: AuthType;
+    localAuth?: AuthType,
     viaProxyLocation?: string;
+    viaProxyWorkingDir?: string;
+    autoUpdate?: boolean;
 }
 ```
 
@@ -66,5 +68,7 @@ interface ViaProxyOpts {
 | localPort | number | *auto determined* | The port to listen on for the local server. If none is specified, it will automatically locate an open port for you on your computer. |
 | localAuth | <a href="#authtype">AuthType</a> | AuthType.NONE | The authentication type to use for the local server |
 | viaProxyLocation | string | "" | The location of the ViaVersion proxy jar. If none specified, it will download automatically to the CWD. |
+| viaProxyWorkingDir | string | "" | The working directory for the ViaVersion proxy. If none specified, it will use the CWD. |
+| autoUpdate | boolean | true | Whether or not to automatically update the ViaVersion proxy. |
 
 
