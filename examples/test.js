@@ -3,9 +3,9 @@ const {createBot} = require('../');
 
 (async () => {
     const bot = await createBot({
-        username: process.argv[2] ?? "viaproxytest",
         host: process.argv[3],
-        port: process.argv[4],
+        port: parseInt(process.argv[2]),
+        username: process.argv[4] ?? "viaproxytest",
     })
     
     bot.on("spawn", () => {

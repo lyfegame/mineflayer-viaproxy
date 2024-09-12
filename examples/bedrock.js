@@ -6,7 +6,9 @@ const {createBot, AuthType } = require('../');
     const bot = await createBot({
         host: process.argv[2],
         port: parseInt(process.argv[3]),
-        username: process.argv[4] ?? "viaproxytest", // this will fail usually. 
+
+        // this will fail usually. The username needs to be an exact match to the account added in ViaProxy.
+        username: process.argv[4] ?? "viaproxytest", 
 
         bedrock: true, // needs to be manually set right now.
         localAuth: AuthType.ACCOUNT // most bedrock accounts require an xbox account.

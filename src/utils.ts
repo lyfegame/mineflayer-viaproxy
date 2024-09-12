@@ -154,10 +154,9 @@ export async function fetchGeyserJar(pluginDir: string, verAndBuild: string, fil
 export async function verifyViaProxyLoc(cwd: string, autoUpdate = true, location?: string): Promise<string> {
   if (!location || !existsSync(location)) {
     const javaVer = await checkJavaVersion();
-    console.log(autoUpdate)
+
     if (!autoUpdate) {
       const viaProxy = viaProxyAvailable(cwd);
-      console.log('found', viaProxy)
       if (viaProxy) {
         debug("Found ViaProxy jar in directory. Using that.");
         return viaProxy;
