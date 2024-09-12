@@ -7,7 +7,7 @@ A mineflayer plugin that allows you to connect to a server through a ViaVersion 
 
 Why? Because I'm tired of people asking for version updates.
 
-## TODOS
+### TODOS
 - [x] Support bedrock versions
 - [x] Support adding accounts to ViaProxy gracefully.
 - [ ] Make fix for prismarine-registry more robust (see patches) 
