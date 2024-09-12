@@ -238,7 +238,7 @@ export async function checkJavaVersion(): Promise<number> {
 }
 
 export async function openViaProxyGUI(fullpath: string, cwd: string) {
-  console.log("opening ViaProxy");
+  console.log("opening ViaProxy. Simply close the window when you're done to allow the code to continue.");
 
   const test = exec(VIA_PROXY_CMD(fullpath, false), { cwd: cwd });
 

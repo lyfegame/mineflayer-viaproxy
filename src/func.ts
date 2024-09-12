@@ -73,7 +73,7 @@ export async function createBot(options: BotOptions & ViaProxyOpts) {
     // perform ViaProxy setup.
     let cmd = VIA_PROXY_CMD(location);
     cmd = cmd + " --target-address " + `${rHost}:${rPort}`;
-    // cmd = cmd + " --target-version " + `"${ver}"` // comment to auto detect version
+    cmd = cmd + " --target-version " + `"${ver}"` // comment to auto detect version
     cmd = cmd + " --bind-address " + `localhost:${port}`;
     cmd = cmd + " --auth-method " + auth;
 
