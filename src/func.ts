@@ -128,7 +128,7 @@ export async function createBot(options: BotOptions & ViaProxyOpts) {
         }
 
         default:
-          throw new Error("Unsupported account version.");
+          throw new Error(`Unsupported account version: ${newestKey}.`);
 
       }
      
