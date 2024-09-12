@@ -40,8 +40,8 @@ export interface ViaProxyOpts {
 
 ```ts
 enum AuthType {
-    NONE
-    OPENAUTHMOD
+    NONE,
+    OPENAUTHMOD,
     ACCOUNT
 }
 ```
@@ -54,7 +54,7 @@ enum AuthType {
 #### `ViaProxyOpts`
 
 ```ts
-export interface ViaProxyOpts {
+interface ViaProxyOpts {
     localPort?: number;
     localAuth?: AuthType,
     viaProxyLocation?: string;
