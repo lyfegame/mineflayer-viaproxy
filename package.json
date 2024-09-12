@@ -6,16 +6,18 @@
   "author": "GenerelSchwerz",
   "license": "MIT",
   "devDependencies": {
+    "mineflayer-viaproxy": "file:./",
     "tsc": "^2.0.4",
-    "typescript": "^5.6.2",
-    "mineflayer-viaproxy": "file:./"
+    "typescript": "^5.6.2"
   },
   "dependencies": {
     "debug": "^4.3.7",
-    "mineflayer": "^4.20.1"
+    "mineflayer": "^4.20.1",
+    "patch-package": "^8.0.0"
   },
   "scripts": {
     "build": "tsc",
-    "test": "node examples/test.js"
+    "test": "node examples/test.js",
+    "postinstall": "patch-package"
   }
 }

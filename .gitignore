@@ -3,3 +3,5 @@ eclcc.log
 
 dist/
 *.lock
+
+**/viaproxy/

@@ -8,4 +8,6 @@ export interface ViaProxyOpts {
     localPort?: number;
     localAuth?: AuthType,
     viaProxyLocation?: string;
+    viaProxyWorkingDir?: string;
+    autoUpdate?: boolean;
 }
