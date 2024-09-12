@@ -17,6 +17,18 @@ npm install mineflayer-viaproxy
 ```js
 const {createBot} = require('mineflayer-viaproxy')
 
+// only difference is that this must be awaited now.
+const bot = await createBot({...})
+
+// if you want to pass viaProxy options, it'd be like so:
+
+const orgBotOpts = {...}
+const viaProxyOpts = {...}
+
+// same object. 
+const bot = await createBot({...orgBotOpts, ...viaProxyOpts})
+```
+
 // do everything else as normal, just import our createBot.
 
 ```
