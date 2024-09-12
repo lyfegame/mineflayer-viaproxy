@@ -1,9 +1,8 @@
-const {createBot} = require('../');
-const { AuthType } = require('../dist/types');
+const {createBot, AuthType, openViaProxyGUI } = require('../');
 
 
 (async () => {
-    console.log(process.argv)
+
     const bot = await createBot({
         host: process.argv[2],
         port: parseInt(process.argv[3]),
