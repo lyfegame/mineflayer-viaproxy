@@ -1,4 +1,5 @@
 const {createBot} = require('../');
+const { AuthType } = require('../dist/types');
 
 
 (async () => {
@@ -8,10 +9,11 @@ const {createBot} = require('../');
         port: parseInt(process.argv[3]),
         username: process.argv[4] ?? "viaproxytest",
         bedrock: true,
+        autoUpdate: false,
+        localAuth: AuthType.ACCOUNT // most bedrock accounts require an xbox account.
     })
 
-    bot.on('login', ()=> console.log('logged in!'))
-    
+  
     bot.on("spawn", () => {
         console.log("Bot spawned");
         bot.chat("Hello world!");
