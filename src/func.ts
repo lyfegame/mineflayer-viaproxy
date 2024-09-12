@@ -1,35 +1,45 @@
 import { Bot, BotOptions, createBot as orgCreateBot } from "mineflayer";
 import { ping } from "minecraft-protocol";
+import { ping as bdPing } from "bedrock-protocol";
 import { supportedVersions } from "minecraft-data";
 import { spawn } from "child_process";
 import { AuthType, ViaProxyOpts } from "./types";
 import { openAuthLogin } from "./openAuthMod";
-import { fetchViaProxyJar, findOpenPort, verifyLocation } from "./utils";
+import { configureGeyserConfig, fetchViaProxyJar, findOpenPort, loadProxySaves, verifyGeyserLoc, verifyViaProxyLoc } from "./utils";
 import path from "path";
 import { existsSync, mkdir, mkdirSync } from "fs";
 
 import "prismarine-registry";
+import { VIA_PROXY_CMD } from "./constants";
 
 const debug = require("debug")("mineflayer-viaproxy");
 
-const VIA_PROXY_CMD = (loc: string) => "java -jar " + loc + " cli";
-
 export async function createBot(options: BotOptions & ViaProxyOpts) {
-  const test = await ping({
-    host: options.host, // external host
-    port: options.port, // external port
-  });
-
   let ver: string;
-  if (test.version instanceof String) {
-    ver = test.version as string;
+
+  if (options.bedrock) {
+    if (options.host == null || options.port == null) throw new Error("Host and port must be provided for bedrock edition.");
+    const test = await bdPing({
+      host: options.host, // external host
+      port: options.port, // external port
+    });
+    ver = `Bedrock ${test.version}`;
   } else {
-    ver = (test.version as { name: string }).name;
+    const test = await ping({
+      host: options.host, // external host
+      port: options.port, // external port
+    });
+
+    if (test.version instanceof String) {
+      ver = test.version as string;
+    } else {
+      ver = (test.version as { name: string }).name;
+    }
   }
 
   let bot!: Bot;
 
-  if (!supportedVersions.pc.includes(ver)) {
+  if (options.bedrock || !supportedVersions.pc.includes(ver)) {
     const cleanupProxy = () => {
       if (bot != null && bot.viaProxy != null && !bot.viaProxy.killed) {
         bot.viaProxy.kill();
@@ -42,8 +52,7 @@ export async function createBot(options: BotOptions & ViaProxyOpts) {
     if (!existsSync(wantedCwd)) {
       await mkdirSync(wantedCwd, { recursive: true });
     }
-
-    const location = await verifyLocation(wantedCwd, options.autoUpdate, options.viaProxyLocation);
+    const location = await verifyViaProxyLoc(wantedCwd, options.autoUpdate, options.viaProxyLocation);
 
     const rHost = options.host ?? "localhost";
     const rPort = options.port ?? 25565;
@@ -53,20 +62,69 @@ export async function createBot(options: BotOptions & ViaProxyOpts) {
     // perform ViaProxy setup.
     let cmd = VIA_PROXY_CMD(location);
     cmd = cmd + " --target-address " + `${rHost}:${rPort}`;
-    // cmd = cmd + " --target-version " + ver; // comment to auto detect version
+    // cmd = cmd + " --target-version " + `"${ver}"` // comment to auto detect version
     cmd = cmd + " --bind-address " + `localhost:${port}`;
     cmd = cmd + " --auth-method " + auth;
-
-    debug(`Launching ViaProxy with cmd: ${cmd}`)
 
     const newOpts = { ...options };
     // here is where we know we need to initialize ViaProxy.
     newOpts.host = "localhost";
     newOpts.port = port;
-    newOpts.version = "1.20.4"
+    newOpts.version = supportedVersions.pc[supportedVersions.pc.length - 1]; // latest version
 
     if (auth !== AuthType.ACCOUNT) newOpts.auth = "offline";
-    else newOpts.auth = "microsoft";
+    else {
+      newOpts.auth = "offline";
+      const saves = loadProxySaves(wantedCwd);
+      const accountTypes = Object.keys(saves).filter((k) => k.startsWith("account"));
+      const newestAccounts = accountTypes.map((k) => parseInt(k.split("V")[1])).sort((a, b) => a - b);
+      const newestKey = newestAccounts[newestAccounts.length - 1];
+      const accounts = saves[`accountsV${newestKey}`];
+
+      if (accounts.length === 0) {
+        throw new Error("No accounts found.");
+      }
+
+      if (options.bedrock) {
+        const bdAccs = accounts.filter((a: any) => a.accountType.includes("Bedrock"));
+        if (bdAccs.length === 0) {
+          throw new Error("No bedrock accounts found.");
+        }
+
+        const matchName = bdAccs.find((a: any) => a.bedrockSession.mcChain.displayName === options.username);
+
+        if (matchName == null) {
+          throw new Error(
+            `No Bedrock account saved with the account name ${options.username}.\nOptions: ${bdAccs
+              .map((a: any) => a.bedrockSession.mcChain.displayName)
+              .join(", ")}`
+          );
+        }
+
+        const idx = accounts.indexOf(matchName);
+        cmd = cmd + " --minecraft-account-index" + ` ${idx}`;
+      } else {
+        const msAccs = accounts.filter((a: any) => a.accountType.includes("Microsoft"));
+        if (msAccs.length === 0) {
+          throw new Error("No Microsoft accounts found.");
+        }
+
+        const matchName = msAccs.find((a: any) => a.javaSession.mcProfile.name === options.username);
+
+        if (matchName == null) {
+          throw new Error(
+            `No Microsoft account saved with the account name ${options.username}.\nOptions: ${msAccs
+              .map((a: any) => a.javaSession.mcProfile.name)
+              .join(", ")}`
+          );
+        }
+
+        const idx = accounts.indexOf(matchName);
+        cmd = cmd + " --minecraft-account-index" + ` ${idx}`;
+      }
+    }
+
+    debug(`Launching ViaProxy with cmd: ${cmd}`);
 
     const viaProxy = spawn(cmd, { shell: true, cwd: wantedCwd });
 
@@ -86,6 +144,11 @@ export async function createBot(options: BotOptions & ViaProxyOpts) {
             bot.on("end", cleanupProxy);
             openAuthLogin(bot).then(resolve);
           }, 1000);
+        }
+
+        if (data.includes("main/WARN")) {
+          const d = data.toString().split("[main/WARN]")[1].trim();
+          debug(d);
         }
       };
       const stdErrListener = (data: any) => {

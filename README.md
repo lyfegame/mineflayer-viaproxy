@@ -2,9 +2,17 @@
 
 [![NPM version](https://img.shields.io/npm/v/mineflayer-viaproxy.svg)](http://npmjs.com/package/mineflayer-viaproxy)
 
+
 A mineflayer plugin that allows you to connect to a server through a ViaVersion proxy.
 
 Why? Because I'm tired of people asking for version updates.
+
+## TODOS
+- [x] Support bedrock versions
+- [ ] Support adding accounts to ViaProxy gracefully.
+- [ ] Make fix for prismarine-registry more robust (see patches) 
+- [ ] Add support for more ViaVersion options
+- [ ] Add support for more ViaProxy options
 
 ## Installation
 

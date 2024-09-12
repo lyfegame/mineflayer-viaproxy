@@ -5,6 +5,7 @@ export enum AuthType {
 }
 
 export interface ViaProxyOpts {
+    bedrock?: boolean;
     localPort?: number;
     localAuth?: AuthType,
     viaProxyLocation?: string;
