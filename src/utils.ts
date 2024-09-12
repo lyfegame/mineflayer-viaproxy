@@ -237,10 +237,9 @@ export async function checkJavaVersion(): Promise<number> {
   });
 }
 
-export async function openViaProxyGUI(cwd: string) {
+export async function openViaProxyGUI(fullpath: string, cwd: string) {
 
-  const loc = await verifyViaProxyLoc(cwd, true);
-  const test = exec(VIA_PROXY_CMD(loc), {cwd: cwd});
+  const test = exec(VIA_PROXY_CMD(fullpath), {cwd: cwd});
   
   await new Promise<void>((resolve, reject) => {
     test.on('close', (code) => {

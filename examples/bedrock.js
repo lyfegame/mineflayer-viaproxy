@@ -24,6 +24,7 @@ const {createBot, AuthType } = require('../');
         console.log(`[${username}] ${message}`);
     });
 
+    // debug events
     bot.on("kicked", console.log.bind(null, 'bot.on("kicked")'));
     bot.on("end", console.log.bind(null, 'bot.on("end")'));
     bot.on("error", console.log.bind(null, 'bot.on("error")'));
