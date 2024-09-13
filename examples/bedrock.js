@@ -11,7 +11,10 @@ const {createBot, AuthType } = require('../');
         username: process.argv[4] ?? "viaproxytest", 
 
         bedrock: true, // needs to be manually set right now.
-        localAuth: AuthType.ACCOUNT // most bedrock accounts require an xbox account.
+        autoUpdate: false,
+        localAuth: AuthType.ACCOUNT, // most bedrock accounts require an xbox account.
+        viaProxyStdoutCb: (data) => console.log(data.toString()),
+        viaProxyStderrCb: (data) => console.error(data.toString())
     })
 
   
