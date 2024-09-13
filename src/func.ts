@@ -23,7 +23,7 @@ import { VIA_PROXY_CMD } from "./constants";
 
 const debug = require("debug")("mineflayer-viaproxy");
 
-export async function createBot(options: BotOptions & ViaProxyOpts) {
+export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot = orgCreateBot) {
   let ver: string;
 
   const bedrock = options.bedrock ?? false;
@@ -106,7 +106,7 @@ export async function createBot(options: BotOptions & ViaProxyOpts) {
           viaProxy!.stderr.removeListener("data", stdErrListener);
           setTimeout(() => {
             debug("Creating bot after ViaProxy started.");
-            bot = orgCreateBot(newOpts);
+            bot = oCreateBot(newOpts);
             bot.on("end", cleanupProxy);
             openAuthLogin(bot).then(resolve);
           }, 1000);
@@ -131,7 +131,7 @@ export async function createBot(options: BotOptions & ViaProxyOpts) {
     bot.viaProxy = viaProxy;
   } else {
     // perform current bot setup.
-    bot = orgCreateBot(options);
+    bot = oCreateBot(options);
   }
 
   return bot;
