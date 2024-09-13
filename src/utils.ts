@@ -270,6 +270,10 @@ export function loadProxySaves(cwd: string) {
 }
 
 export async function identifyAccount(username: string, bedrock: boolean, location: string, wantedCwd: string, depth = 0): Promise<number> {
+  if (depth < 0) {
+    throw new Error("Invaid depth received (below zero). This should never be manually specified.")
+  }
+  
   const saves = loadProxySaves(wantedCwd);
   const accountTypes = Object.keys(saves).filter((k) => k.startsWith("account"));
   const newestAccounts = accountTypes.map((k) => parseInt(k.split("V")[1])).sort((a, b) => a - b);
