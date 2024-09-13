@@ -224,9 +224,13 @@ export async function verifyGeyserLoc(pluginDir: string, autoUpdate = true, loca
 // identify java version and check if it's 8 or higher.
 export async function checkJavaVersion(): Promise<number> {
   // don't know why it's like this, but ti is.
-  const { stderr: stdout } = await exec("java -version");
+  const { stderr: stdout, exitCode } = await exec("java -version");
 
-  return new Promise<number>((resolve, reject) => {
+  if (exitCode !== 0) {
+    throw new Error("Failed to check Java version. Most likely, java is not installed.");
+  }
+
+  return await new Promise<number>((resolve, reject) => {
     if (stdout != null) {
       stdout.on("data", (data: string) => {
         const version = data.split(" ")[2].replace(/"/g, "");
@@ -235,6 +239,7 @@ export async function checkJavaVersion(): Promise<number> {
       });
     }
   });
+
 }
 
 export async function openViaProxyGUI(fullpath: string, cwd: string) {
