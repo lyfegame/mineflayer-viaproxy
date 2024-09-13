@@ -11,6 +11,9 @@ export interface ViaProxyOpts {
     viaProxyLocation?: string;
     viaProxyWorkingDir?: string;
     autoUpdate?: boolean;
+    viaProxyStdoutCb?: (data: any) => void
+    viaProxyStderrCb?: (data: any) => void
+
 }
 
 

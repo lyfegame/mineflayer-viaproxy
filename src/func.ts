@@ -94,6 +94,12 @@ export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot =
 
     const viaProxy = spawn(cmd, { shell: true, cwd: wantedCwd });
 
+    if (options.viaProxyStdoutCb)
+    viaProxy.stdout.on("data", options.viaProxyStdoutCb);
+
+    if (options.viaProxyStderrCb)
+    viaProxy.stderr.on("data", options.viaProxyStderrCb);
+
     // added for robustness, just to be sure.
     process.on("beforeExit", cleanupProxy);
 
