@@ -284,7 +284,11 @@ export async function identifyAccount(username: string, bedrock: boolean, locati
       const accounts = saves[`accountsV${newestKey}`];
 
       if (accounts.length === 0) {
-        throw new Error("No accounts found.");
+        if (depth >= 1) {
+          throw new Error("No accounts found.");
+        }
+        await openViaProxyGUI(location, wantedCwd)
+        return await identifyAccount(username, bedrock, location, wantedCwd, depth + 1);
       }
 
       if (bedrock) {
