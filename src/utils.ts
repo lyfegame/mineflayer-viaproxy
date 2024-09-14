@@ -225,8 +225,8 @@ export async function verifyGeyserLoc(pluginDir: string, autoUpdate = true, loca
 export async function checkJavaVersion(): Promise<number> {
   // don't know why it's like this, but ti is.
   const { stderr: stdout, exitCode } = await exec("java -version");
-
-  if (exitCode !== 0) {
+ 
+  if (exitCode != null && exitCode !== 0) {
     throw new Error("Failed to check Java version. Most likely, java is not installed.");
   }
 

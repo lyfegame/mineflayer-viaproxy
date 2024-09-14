@@ -1,4 +1,4 @@
-const {createBot, AuthType } = require('../');
+const {createBot, AuthType } = require('mineflayer-viaproxy');
 
 
 (async () => {
@@ -34,3 +34,18 @@ const {createBot, AuthType } = require('../');
     bot._client.on("error", console.log.bind(null, 'bot._client.on("error")'));
     bot._client.on("end", console.log.bind(null, 'bot._client.on("end")'));
 })();
+
+
+function frequency(num, lst) {
+    freq = 0
+    n = lst.length
+
+    for (i = 1 to n) {
+        if (lst[i] == num) {
+            freq = freq + 1
+        }
+
+    }
+
+    return freq
+}
