@@ -5,6 +5,7 @@ export enum AuthType {
 }
 
 export interface ViaProxyOpts {
+    javaPath?: string;
     bedrock?: boolean;
     localPort?: number;
     localAuth?: AuthType,

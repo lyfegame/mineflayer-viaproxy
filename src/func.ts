@@ -64,6 +64,7 @@ export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot =
       await mkdirSync(wantedCwd, { recursive: true });
     }
     const location = await verifyViaProxyLoc(wantedCwd, options.autoUpdate, options.viaProxyLocation);
+    const javaLoc = options.javaPath ?? "java";
 
     const rHost = options.host ?? "localhost";
     const rPort = options.port ?? 25565;
@@ -71,7 +72,7 @@ export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot =
     const auth = options.localAuth ?? AuthType.NONE; // TODO maybe OPENAUTHMOD if we support by default?
 
     // perform ViaProxy setup.
-    let cmd = VIA_PROXY_CMD(location);
+    let cmd = VIA_PROXY_CMD(javaLoc, location);
     cmd = cmd + " --target-address " + `${rHost}:${rPort}`;
     cmd = cmd + " --target-version " + `"${ver}"` // comment to auto detect version
     cmd = cmd + " --bind-address " + `localhost:${port}`;
@@ -86,7 +87,7 @@ export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot =
     if (auth !== AuthType.ACCOUNT) newOpts.auth = "offline";
     else {
       newOpts.auth = "offline";
-      const idx = await identifyAccount(options.username, bedrock, location, wantedCwd);
+      const idx = await identifyAccount(options.username, bedrock, javaLoc, location, wantedCwd);
       cmd = cmd + " --minecraft-account-index" + ` ${idx}`;
     }
 

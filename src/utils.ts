@@ -242,10 +242,10 @@ export async function checkJavaVersion(): Promise<number> {
 
 }
 
-export async function openViaProxyGUI(fullpath: string, cwd: string) {
+export async function openViaProxyGUI(javaLoc: string, fullpath: string, cwd: string) {
   console.log("opening ViaProxy. Simply close the window when you're done to allow the code to continue.");
 
-  const test = exec(VIA_PROXY_CMD(fullpath, false), { cwd: cwd });
+  const test = exec(VIA_PROXY_CMD(javaLoc, fullpath, false), { cwd: cwd });
 
   await new Promise<void>((resolve, reject) => {
     test.on("close", (code) => {
@@ -269,7 +269,7 @@ export function loadProxySaves(cwd: string) {
   return JSON.parse(readFileSync(loc, "utf-8"));
 }
 
-export async function identifyAccount(username: string, bedrock: boolean, location: string, wantedCwd: string, depth = 0): Promise<number> {
+export async function identifyAccount(username: string, bedrock: boolean, javaLoc: string, location: string, wantedCwd: string, depth = 0): Promise<number> {
   if (depth < 0) {
     throw new Error("Invaid depth received (below zero). This should never be manually specified.")
   }
@@ -287,8 +287,8 @@ export async function identifyAccount(username: string, bedrock: boolean, locati
         if (depth >= 1) {
           throw new Error("No accounts found.");
         }
-        await openViaProxyGUI(location, wantedCwd)
-        return await identifyAccount(username, bedrock, location, wantedCwd, depth + 1);
+        await openViaProxyGUI(javaLoc, location, wantedCwd)
+        return await identifyAccount(username, bedrock, javaLoc, location, wantedCwd, depth + 1);
       }
 
       if (bedrock) {
@@ -297,8 +297,8 @@ export async function identifyAccount(username: string, bedrock: boolean, locati
           if (depth >= 1) {
             throw new Error("No bedrock accounts found (even after opening GUI).");
           }
-          await openViaProxyGUI(location, wantedCwd);
-          return await identifyAccount(username, bedrock, location, wantedCwd, depth + 1);
+          await openViaProxyGUI(javaLoc, location, wantedCwd);
+          return await identifyAccount(username, bedrock, javaLoc, location, wantedCwd, depth + 1);
         }
 
         const matchName = bdAccs.find((a: any) => a.bedrockSession.mcChain.displayName === username);
@@ -312,8 +312,8 @@ export async function identifyAccount(username: string, bedrock: boolean, locati
             );
           }
 
-          await openViaProxyGUI(location, wantedCwd);
-          return await identifyAccount(username, bedrock, location, wantedCwd, depth + 1);
+          await openViaProxyGUI(javaLoc, location, wantedCwd);
+          return await identifyAccount(username, bedrock, javaLoc, location, wantedCwd, depth + 1);
         }
 
         const idx = accounts.indexOf(matchName);
@@ -324,8 +324,8 @@ export async function identifyAccount(username: string, bedrock: boolean, locati
           if (depth >= 1) {
             throw new Error("No Microsoft accounts found.");
           }
-          await openViaProxyGUI(location, wantedCwd);
-          return await identifyAccount(username, bedrock, location, wantedCwd, depth + 1);
+          await openViaProxyGUI(javaLoc, location, wantedCwd);
+          return await identifyAccount(username, bedrock, javaLoc, location, wantedCwd, depth + 1);
         }
 
         const matchName = msAccs.find((a: any) => a.javaSession.mcProfile.name === username);
@@ -338,8 +338,8 @@ export async function identifyAccount(username: string, bedrock: boolean, locati
                 .join(", ")}`
             );
           }
-          await openViaProxyGUI(location, wantedCwd);
-          return await identifyAccount(username, bedrock, location, wantedCwd, depth + 1);
+          await openViaProxyGUI(javaLoc, location, wantedCwd);
+          return await identifyAccount(username, bedrock, javaLoc, location, wantedCwd, depth + 1);
         }
 
         const idx = accounts.indexOf(matchName);
