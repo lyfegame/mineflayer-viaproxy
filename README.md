@@ -55,18 +55,6 @@ const bot = await createBot({...orgBotOpts, ...viaProxyOpts});
 
 ## API
 
-<!-- export enum AuthType {
-    NONE = "NONE",
-    OPENAUTHMOD = "OPENAUTHMOD",
-    ACCOUNT = "ACCOUNT",
-}
-
-export interface ViaProxyOpts {
-    localPort?: number;
-    localAuth?: AuthType,
-    viaProxyLocation?: string;
-} -->
-
 ### Types
 
 #### `AuthType`
@@ -88,20 +76,28 @@ enum AuthType {
 
 ```ts
 interface ViaProxyOpts {
+    javaPath?: string;
+    bedrock?: boolean;
     localPort?: number;
     localAuth?: AuthType,
     viaProxyLocation?: string;
     viaProxyWorkingDir?: string;
     autoUpdate?: boolean;
+    viaProxyStdoutCb?: (data: any) => void
+    viaProxyStderrCb?: (data: any) => void
+
 }
 ```
 
 | Name | Type | Default | Description |
 |------|------|---------|-------------|
+| javaPath | string | "java" | The path to the java executable. |
+| bedrock | boolean | false | Whether or not to use the bedrock version of ViaProxy. |
 | localPort | number | *auto determined* | The port to listen on for the local server. If none is specified, it will automatically locate an open port for you on your computer. |
 | localAuth | <a href="#authtype">AuthType</a> | AuthType.NONE | The authentication type to use for the local server |
-| viaProxyLocation | string | "" | The location of the ViaVersion proxy jar. If none specified, it will download automatically to the CWD. |
-| viaProxyWorkingDir | string | "" | The working directory for the ViaVersion proxy. If none specified, it will use the CWD. |
+| viaProxyLocation | string | "" | The location of the ViaVersion proxy jar. If none specified, it will download automatically to the CWD + `viaproxy`. |
+| viaProxyWorkingDir | string | "" | The working directory for the ViaVersion proxy. If none specified, it will use the CWD + `viaproxy`. |
 | autoUpdate | boolean | true | Whether or not to automatically update the ViaVersion proxy. |
-
+| viaProxyStdoutCb | (data: any) => void | undefined | A callback for the stdout of the ViaVersion proxy. |
+| viaProxyStderrCb | (data: any) => void | undefined | A callback for the stderr of the ViaVersion proxy. |
 
