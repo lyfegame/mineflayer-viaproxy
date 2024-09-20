@@ -22,12 +22,16 @@ To do this, you must add the following to your package.json:
 }
 ```
 
+# NOTICE 2
+This plugin does not work with Python, due to JSPYBridge breaking internally. It is not my fault, as far as I know, and I do not know why.
+
 ### TODOS
 - [x] Support bedrock versions
 - [x] Support adding accounts to ViaProxy gracefully.
 - [ ] Make fix for prismarine-registry more robust (see patches) 
 - [ ] Add support for more ViaVersion options
 - [ ] Add support for more ViaProxy options
+- [ ] Support Python
 
 ## Installation
 
