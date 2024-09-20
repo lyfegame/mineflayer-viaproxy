@@ -66,7 +66,7 @@ export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot =
     const javaLoc = options.javaPath ?? "java";
     const location = await verifyViaProxyLoc(wantedCwd, options.autoUpdate, javaLoc, options.viaProxyLocation);
 
-    const rHost = options.host ?? "localhost";
+    const rHost = options.host ?? "127.0.0.1";
     const rPort = options.port ?? 25565;
     const port = options.localPort ?? (await findOpenPort());
     const auth = options.localAuth ?? (options.auth !== "offline" || !options.auth) ? AuthType.ACCOUNT : AuthType.NONE; // TODO maybe OPENAUTHMOD if we support by default?
@@ -75,13 +75,13 @@ export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot =
     let cmd = VIA_PROXY_CMD(javaLoc, location);
     cmd = cmd + " --target-address " + `${rHost}:${rPort}`;
     // cmd = cmd + " --target-version " + `"${ver}"` // comment to auto detect version
-    cmd = cmd + " --bind-address " + `localhost:${port}`;
+    cmd = cmd + " --bind-address " + `127.0.0.1:${port}`;
     cmd = cmd + " --auth-method " + auth;
     cmd = cmd + " --proxy-online-mode " + "false"
 
     const newOpts = { ...options };
     // here is where we know we need to initialize ViaProxy.
-    newOpts.host = "localhost";
+    newOpts.host = "127.0.0.1";
     newOpts.port = port;
     newOpts.version = supportedVersions.pc[supportedVersions.pc.length - 1]; // latest version
 
