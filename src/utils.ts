@@ -151,9 +151,9 @@ export async function fetchGeyserJar(pluginDir: string, verAndBuild: string, fil
   return filepath;
 }
 
-export async function verifyViaProxyLoc(cwd: string, autoUpdate = true, location?: string): Promise<string> {
+export async function verifyViaProxyLoc(cwd: string, autoUpdate = true, javaLoc: string, location?: string): Promise<string> {
   if (!location || !existsSync(location)) {
-    const javaVer = await checkJavaVersion();
+    const javaVer = await checkJavaVersion(javaLoc);
 
     if (!autoUpdate) {
       const viaProxy = viaProxyAvailable(cwd);
@@ -222,9 +222,9 @@ export async function verifyGeyserLoc(pluginDir: string, autoUpdate = true, loca
 }
 
 // identify java version and check if it's 8 or higher.
-export async function checkJavaVersion(): Promise<number> {
+export async function checkJavaVersion(javaLoc: string): Promise<number> {
   // don't know why it's like this, but ti is.
-  const { stderr: stdout, exitCode } = await exec("java -version");
+  const { stderr: stdout, exitCode } = await exec(`${javaLoc} -version`);
 
   if (exitCode != null && exitCode !== 0) {
     throw new Error("Failed to check Java version. Most likely, java is not installed.");

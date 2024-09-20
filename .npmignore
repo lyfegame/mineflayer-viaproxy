@@ -2,3 +2,7 @@ src
 examples
 .vscode
 tsconfig.json
+
+tests
+
+**/viaproxy/

@@ -63,8 +63,8 @@ export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot =
     if (!existsSync(wantedCwd)) {
       await mkdirSync(wantedCwd, { recursive: true });
     }
-    const location = await verifyViaProxyLoc(wantedCwd, options.autoUpdate, options.viaProxyLocation);
     const javaLoc = options.javaPath ?? "java";
+    const location = await verifyViaProxyLoc(wantedCwd, options.autoUpdate, javaLoc, options.viaProxyLocation);
 
     const rHost = options.host ?? "localhost";
     const rPort = options.port ?? 25565;
