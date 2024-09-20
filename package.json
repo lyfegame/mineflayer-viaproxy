@@ -7,14 +7,14 @@
   "license": "MIT",
   "devDependencies": {
     "@types/js-yaml": "^4.0.9",
-    "bedrock-protocol": "^3.39.0",
     "mineflayer-viaproxy": "file:./",
     "typescript": "^5.6.2"
   },
   "dependencies": {
     "debug": "^4.3.7",
     "js-yaml": "^4.1.0",
-    "mineflayer": "^4.20.1"
+    "mineflayer": "^4.20.1",
+    "bedrock-protocol": "^3.40.0"
   },
   "resolutions": {
     "prismarine-registry": "git+https://github.com/GenerelSchwerz/prismarine-registry#mc-prefix-fix"

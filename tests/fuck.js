@@ -8,7 +8,7 @@ async function startBot() {
         host: 'ir2.exoticservers.co',//this is normally a different server but I'm just trying on hypixel so that ik it's not a server issue
         port: 3076,
         auth: "microsoft",
-        javaPath: "/usr/lib/jvm/java-8-openjdk/jre/bin/java"
+        javaPath: "java"
     })
     console.log("Made bot");
 
@@ -18,6 +18,8 @@ async function startBot() {
 
     bot.on('spawn', async () => {
         console.log("Spawned!");
+        await bot.waitForTicks(10);
+        bot.viaProxy.kill()
     })
 
     bot.on("end", console.log)

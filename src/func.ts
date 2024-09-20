@@ -53,7 +53,7 @@ export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot =
   if (bedrock || !supportedVersions.pc.includes(ver)) {
     const cleanupProxy = () => {
       if (bot != null && bot.viaProxy != null && !bot.viaProxy.killed) {
-        bot.viaProxy.kill();
+        bot.viaProxy.kill('SIGINT');
         delete bot.viaProxy; // this shouldn't be necessary, but why not.
       }
     };

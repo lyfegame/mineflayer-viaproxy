@@ -36,22 +36,3 @@ const {createBot, AuthType } = require('mineflayer-viaproxy');
 })();
 
 
-function frequency(target, lst) {
-
-    // initialization (i = 0)
-    freq = 0
-    n = lst.length
-
-    // maintenance
-    for (i = 1 to n) {
-
-        // frequency for target in lst[i], maintaining invariance
-        if (lst[i] == target) {
-            freq = freq + 1
-        }
-
-    }
-
-    // termination (i = n)
-    return freq
-}
