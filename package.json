@@ -14,6 +14,8 @@
     "bedrock-protocol": "^3.40.0",
     "debug": "^4.3.7",
     "js-yaml": "^4.1.0",
+    "minecraft-data": "^3.69.0",
+    "minecraft-protocol": "^1.47.0",
     "mineflayer": "^4.20.1"
   },
   "resolutions": {
