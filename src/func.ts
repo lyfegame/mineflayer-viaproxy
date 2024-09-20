@@ -73,7 +73,8 @@ export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot =
       debug(`Failed to match version from ${ver}!`);
     } else {
       const sorted = match.sort(cmpVersions);
-      ver = sorted[0];
+      debug(`Detected versions [${sorted.join(', ')}] from "${ver}".`)
+      ver = sorted[0]
 
       // if any version is greater than current latest version
       let higherVerDetected = false;
@@ -87,6 +88,7 @@ export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot =
         } else if (higherVerDetected) {
           // we found a lower version and a higher version, meaning multiple versions are supported.
           // this means we don't need viaProxy.
+          debug(`Multi-version detected. Using latest version ${currentLatestVersion}.`)
           ver = currentLatestVersion;
           break;
         }
