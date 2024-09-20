@@ -138,6 +138,7 @@ export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot =
 
     bot.viaProxy = viaProxy;
   } else {
+    debug(`For version ${ver}, ViaProxy is not needed.`)
     // perform current bot setup.
     bot = oCreateBot(options);
   }
