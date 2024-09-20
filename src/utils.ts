@@ -281,7 +281,18 @@ export async function identifyAccount(
     throw new Error("Invaid depth received (below zero). This should never be manually specified.");
   }
 
-  const saves = loadProxySaves(wantedCwd);
+  let saves;
+  try {
+    saves = loadProxySaves(wantedCwd);
+  } catch (err) {
+    if (depth >= 1) {
+      throw err;
+    }
+    debug("No saves found. Opening GUI.");
+    await openViaProxyGUI(javaLoc, location, wantedCwd);
+    return await identifyAccount(username, bedrock, javaLoc, location, wantedCwd, depth + 1);
+  }
+  
   const accountTypes = Object.keys(saves).filter((k) => k.startsWith("account"));
   const newestAccounts = accountTypes.map((k) => parseInt(k.split("V")[1])).sort((a, b) => a - b);
   const newestKey = newestAccounts[newestAccounts.length - 1];
