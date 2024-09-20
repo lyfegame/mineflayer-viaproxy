@@ -23,6 +23,7 @@ export async function openAuthLogin(bot: Bot) {
   bot._client.on("login_plugin_request", listener);
 }
 
+
 /**
  * Tries to find an open port to use for the prismarine-viewer server.
  */

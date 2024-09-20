@@ -23,9 +23,26 @@ import { VIA_PROXY_CMD } from "./constants";
 
 const debug = require("debug")("mineflayer-viaproxy");
 
+/**
+ * sort for newest version first.
+ */
+const cmpVersions = (first: string, second: string) => {
+  const a = first.split(".").map((x) => parseInt(x));
+  const b = second.split(".").map((x) => parseInt(x));
+
+  for (let i = 0; i < a.length; i++) {
+    if (a[i] > b[i]) return -1;
+    if (a[i] < b[i]) return 1;
+  }
+
+  return 0;
+};
+
 export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot = orgCreateBot) {
   let ver: string;
+  let useViaProxy = false;
 
+  const currentLatestVersion = supportedVersions.pc[supportedVersions.pc.length - 1]; // latest version;
   const bedrock = options.bedrock ?? false;
 
   if (bedrock) {
@@ -35,6 +52,8 @@ export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot =
       port: options.port, // external port
     });
     ver = `Bedrock ${test.version}`;
+    useViaProxy = true;
+
   } else {
     const test = await ping({
       host: options.host, // external host
@@ -46,14 +65,47 @@ export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot =
     } else {
       ver = (test.version as { name: string }).name;
     }
+
+    const regex = /1\.\d+(\.\d+)?/g;
+    const match = ver.match(regex);
+
+    if (match == null) {
+      debug(`Failed to match version from ${ver}!`);
+    } else {
+      const sorted = match.sort(cmpVersions);
+      ver = sorted[0];
+
+      // if any version is greater than current latest version
+      let higherVerDetected = false;
+      for (const v of sorted) {
+        const cmp = cmpVersions(v, currentLatestVersion)
+        if (cmp < 0) {
+          higherVerDetected = true;
+        } else if (cmp === 0) {
+          ver = v;
+          break;
+        } else if (higherVerDetected) {
+          // we found a lower version and a higher version, meaning multiple versions are supported.
+          // this means we don't need viaProxy.
+          ver = currentLatestVersion;
+          break;
+        }
+      }
+
+      useViaProxy = !supportedVersions.pc.includes(ver);
+    }
   }
+
 
   let bot!: Bot;
 
-  if (bedrock || !supportedVersions.pc.includes(ver)) {
+  if (useViaProxy) {
+
+    debug(`ViaProxy is needed for version ${ver}. Launching it.`)
+
     const cleanupProxy = () => {
       if (bot != null && bot.viaProxy != null && !bot.viaProxy.killed) {
-        bot.viaProxy.kill('SIGINT');
+        bot.viaProxy.kill("SIGINT");
         delete bot.viaProxy; // this shouldn't be necessary, but why not.
       }
     };
@@ -77,13 +129,13 @@ export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot =
     // cmd = cmd + " --target-version " + `"${ver}"` // comment to auto detect version
     cmd = cmd + " --bind-address " + `127.0.0.1:${port}`;
     cmd = cmd + " --auth-method " + auth;
-    cmd = cmd + " --proxy-online-mode " + "false"
+    cmd = cmd + " --proxy-online-mode " + "false";
 
     const newOpts = { ...options };
     // here is where we know we need to initialize ViaProxy.
     newOpts.host = "127.0.0.1";
     newOpts.port = port;
-    newOpts.version = supportedVersions.pc[supportedVersions.pc.length - 1]; // latest version
+    newOpts.version = currentLatestVersion;
 
     if (auth !== AuthType.ACCOUNT) newOpts.auth = "offline";
     else {
@@ -96,11 +148,9 @@ export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot =
 
     const viaProxy = spawn(cmd, { shell: true, cwd: wantedCwd });
 
-    if (options.viaProxyStdoutCb)
-    viaProxy.stdout.on("data", options.viaProxyStdoutCb);
+    if (options.viaProxyStdoutCb) viaProxy.stdout.on("data", options.viaProxyStdoutCb);
 
-    if (options.viaProxyStderrCb)
-    viaProxy.stderr.on("data", options.viaProxyStderrCb);
+    if (options.viaProxyStderrCb) viaProxy.stderr.on("data", options.viaProxyStderrCb);
 
     // added for robustness, just to be sure.
     process.on("beforeExit", cleanupProxy);
@@ -138,7 +188,7 @@ export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot =
 
     bot.viaProxy = viaProxy;
   } else {
-    debug(`For version ${ver}, ViaProxy is not needed.`)
+    debug(`For version ${ver}, ViaProxy is not needed. Launching bot normally.`);
     // perform current bot setup.
     bot = oCreateBot(options);
   }
