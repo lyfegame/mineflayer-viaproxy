@@ -41,7 +41,6 @@ export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot =
       port: options.port, // external port
     });
 
-    console.log(test)
     if (test.version instanceof String) {
       ver = test.version as string;
     } else {
@@ -70,7 +69,7 @@ export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot =
     const rHost = options.host ?? "localhost";
     const rPort = options.port ?? 25565;
     const port = options.localPort ?? (await findOpenPort());
-    const auth = options.localAuth ?? options.auth !== "offline" ? AuthType.ACCOUNT : AuthType.NONE; // TODO maybe OPENAUTHMOD if we support by default?
+    const auth = options.localAuth ?? (options.auth !== "offline" || !options.auth) ? AuthType.ACCOUNT : AuthType.NONE; // TODO maybe OPENAUTHMOD if we support by default?
 
     // perform ViaProxy setup.
     let cmd = VIA_PROXY_CMD(javaLoc, location);

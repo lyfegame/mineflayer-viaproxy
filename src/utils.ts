@@ -225,7 +225,7 @@ export async function verifyGeyserLoc(pluginDir: string, autoUpdate = true, loca
 export async function checkJavaVersion(): Promise<number> {
   // don't know why it's like this, but ti is.
   const { stderr: stdout, exitCode } = await exec("java -version");
- 
+
   if (exitCode != null && exitCode !== 0) {
     throw new Error("Failed to check Java version. Most likely, java is not installed.");
   }
@@ -239,7 +239,6 @@ export async function checkJavaVersion(): Promise<number> {
       });
     }
   });
-
 }
 
 export async function openViaProxyGUI(javaLoc: string, fullpath: string, cwd: string) {
@@ -269,80 +268,71 @@ export function loadProxySaves(cwd: string) {
   return JSON.parse(readFileSync(loc, "utf-8"));
 }
 
-export async function identifyAccount(username: string, bedrock: boolean, javaLoc: string, location: string, wantedCwd: string, depth = 0): Promise<number> {
+export async function identifyAccount(
+  username: string,
+  bedrock: boolean,
+  javaLoc: string,
+  location: string,
+  wantedCwd: string,
+  depth = 0
+): Promise<number> {
   if (depth < 0) {
-    throw new Error("Invaid depth received (below zero). This should never be manually specified.")
+    throw new Error("Invaid depth received (below zero). This should never be manually specified.");
   }
-  
+
   const saves = loadProxySaves(wantedCwd);
   const accountTypes = Object.keys(saves).filter((k) => k.startsWith("account"));
   const newestAccounts = accountTypes.map((k) => parseInt(k.split("V")[1])).sort((a, b) => a - b);
   const newestKey = newestAccounts[newestAccounts.length - 1];
+  const accounts: Record<string, any>[] = saves[`accountsV${newestKey}`];
 
   switch (newestKey) {
     case 3: {
-      const accounts = saves[`accountsV${newestKey}`];
+      // get all bedrock usernames using .reduce()
 
       if (accounts.length === 0) {
         if (depth >= 1) {
           throw new Error("No accounts found.");
         }
-        await openViaProxyGUI(javaLoc, location, wantedCwd)
+        debug(`No users in saves.json found Opening GUI.\nLocation: ${location}`);
+        await openViaProxyGUI(javaLoc, location, wantedCwd);
         return await identifyAccount(username, bedrock, javaLoc, location, wantedCwd, depth + 1);
       }
 
+      const bdAccNames: string[] = []; //accounts.reduce((prev, cur) => (cur.accountType.includes("Bedrock") ? prev.push(cur.bedrockSession.mcChain.displayName) && prev : prev), []) as unknown as string[];
+      const msAccNames: string[] = []; //accounts.reduce((prev, cur) => (cur.accountType.includes("Microsoft") ? prev.push(cur.javaSession.mcProfile.name) && prev : prev), []) as unknown as string[];
+
+      for (const acc of accounts) {
+        if (acc.accountType.includes("Bedrock")) bdAccNames.push(acc.bedrockSession.mcChain.displayName);
+        else if (acc.accountType.includes("Microsoft")) msAccNames.push(acc.javaSession.mcProfile.name);
+      }
+
+      debug(`Available Bedrock users: ${bdAccNames.length > 0 ? bdAccNames.join(", ") : "None"}`);
+      debug(`Available Java users: ${msAccNames.length > 0 ? msAccNames.join(", ") : "None"}`);
+
       if (bedrock) {
-        const bdAccs = accounts.filter((a: any) => a.accountType.includes("Bedrock"));
-        if (bdAccs.length === 0) {
+        if (bdAccNames.length === 0 || !bdAccNames.includes(username)) {
           if (depth >= 1) {
-            throw new Error("No bedrock accounts found (even after opening GUI).");
+            if (bdAccNames.length === 0) throw new Error("No bedrock accounts found (even after opening GUI).");
+            else throw new Error(`No Bedrock account saved with the account name ${username}.\nOptions: ${bdAccNames.join(", ")}`);
           }
           await openViaProxyGUI(javaLoc, location, wantedCwd);
           return await identifyAccount(username, bedrock, javaLoc, location, wantedCwd, depth + 1);
         }
 
-        const matchName = bdAccs.find((a: any) => a.bedrockSession.mcChain.displayName === username);
-
-        if (matchName == null) {
-          if (depth >= 1) {
-            throw new Error(
-              `No Bedrock account saved with the account name ${username}.\nOptions: ${bdAccs
-                .map((a: any) => a.bedrockSession.mcChain.displayName)
-                .join(", ")}`
-            );
-          }
-
-          await openViaProxyGUI(javaLoc, location, wantedCwd);
-          return await identifyAccount(username, bedrock, javaLoc, location, wantedCwd, depth + 1);
-        }
-
-        const idx = accounts.indexOf(matchName);
+        const idx = accounts.findIndex((acc) => acc.bedrockSession.mcChain.displayName === username);
         return idx;
       } else {
-        const msAccs = accounts.filter((a: any) => a.accountType.includes("Microsoft"));
-        if (msAccs.length === 0) {
+        if (msAccNames.length === 0 || !msAccNames.includes(username)) {
           if (depth >= 1) {
-            throw new Error("No Microsoft accounts found.");
+            if (msAccNames.length === 0) throw new Error("No Microsoft accounts found.");
+            else throw new Error(`No Microsoft account saved with the account name ${username}.\nOptions: ${msAccNames.join(", ")}`);
           }
           await openViaProxyGUI(javaLoc, location, wantedCwd);
           return await identifyAccount(username, bedrock, javaLoc, location, wantedCwd, depth + 1);
         }
 
-        const matchName = msAccs.find((a: any) => a.javaSession.mcProfile.name === username);
-
-        if (matchName == null) {
-          if (depth >= 1) {
-            throw new Error(
-              `No Microsoft account saved with the account name ${username}.\nOptions: ${msAccs
-                .map((a: any) => a.javaSession.mcProfile.name)
-                .join(", ")}`
-            );
-          }
-          await openViaProxyGUI(javaLoc, location, wantedCwd);
-          return await identifyAccount(username, bedrock, javaLoc, location, wantedCwd, depth + 1);
-        }
-
-        const idx = accounts.indexOf(matchName);
+        const idx = accounts.findIndex((acc) => acc.javaSession.mcProfile.name === username);
         return idx;
       }
     }
