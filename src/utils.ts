@@ -178,6 +178,7 @@ export async function verifyViaProxyLoc(cwd: string, autoUpdate = true, javaLoc:
       }
     }
 
+    debug(`Fetching ViaProxy for java version ${version}.`)
     const jar = await fetchViaProxyJar(cwd, version, filename);
     if (!jar) throw new Error("Failed to fetch ViaProxy jar.");
     return jar;

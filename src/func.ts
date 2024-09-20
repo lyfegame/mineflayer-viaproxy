@@ -77,6 +77,7 @@ export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot =
     // cmd = cmd + " --target-version " + `"${ver}"` // comment to auto detect version
     cmd = cmd + " --bind-address " + `localhost:${port}`;
     cmd = cmd + " --auth-method " + auth;
+    cmd = cmd + " --proxy-online-mode " + "false"
 
     const newOpts = { ...options };
     // here is where we know we need to initialize ViaProxy.
