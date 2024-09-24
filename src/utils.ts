@@ -40,11 +40,14 @@ export async function findOpenPort(): Promise<number> {
   });
 }
 
-function viaProxyAvailable(cwd: string): string | null {
+function viaProxyAvailable(cwd: string, use8: boolean): string | null {
   // don't match the +java8 part, as it's optional.
   // ViaProxy-3.3.4-SNAPSHOT.jar
   // ViaProxy-3.3.3-RELEASE.jar
-  const regex = /ViaProxy-\d+\.\d+\.\d+(-SNAPSHOT)?(-RELEASE)?(\+java8)?\.jar/;
+  // const regex = /ViaProxy-\d+\.\d+\.\d+(-SNAPSHOT)?(-RELEASE)?(\+java8)?\.jar/;
+
+  // only allow java8 if use8 is true.
+  const regex = new RegExp(`ViaProxy-\\d+\\.\\d+\\.\\d+(-SNAPSHOT)?(-RELEASE)?(${use8 ? "\\+java8" : ""})?\\.jar`);
 
   const valid = [];
   // check directory for file names
@@ -249,7 +252,7 @@ export async function verifyViaProxyLoc(cwd: string, autoUpdate = true, javaLoc:
     const javaVer = await checkJavaVersion(javaLoc);
 
     if (!autoUpdate) {
-      const viaProxy = viaProxyAvailable(cwd);
+      const viaProxy = viaProxyAvailable(cwd, javaVer < 17);
       if (viaProxy) {
         debug("Found ViaProxy jar in directory. Using that.");
         return viaProxy;
@@ -269,8 +272,7 @@ export async function verifyViaProxyLoc(cwd: string, autoUpdate = true, javaLoc:
           unlinkSync(testLoc);
         }
       } else {
-        const available = viaProxyAvailable(cwd);
-        console.log(available)
+        const available = viaProxyAvailable(cwd, javaVer < 17);
         if (available) {
           if (isGreaterThan(extractVersion(available), version) >= 0) {
             debug(`Found version ${extractVersion(available)} of ViaProxy, which is good enough. Skipping download.`);
