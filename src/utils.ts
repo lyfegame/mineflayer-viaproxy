@@ -43,16 +43,42 @@ export async function findOpenPort(): Promise<number> {
 function viaProxyAvailable(cwd: string): string | null {
   // don't match the +java8 part, as it's optional.
   // ViaProxy-3.3.4-SNAPSHOT.jar
-  // ViaProxy-3.3.3.jar
-  const regex = /ViaProxy-\d+\.\d+\.\d+(-SNAPSHOT)?(\+java8)?\.jar/;
+  // ViaProxy-3.3.3-RELEASE.jar
+  const regex = /ViaProxy-\d+\.\d+\.\d+(-SNAPSHOT)?(-RELEASE)?(\+java8)?\.jar/;
 
+  const valid = [];
   // check directory for file names
   const files = readdirSync(cwd);
   for (const file of files) {
-    if (regex.test(file)) return join(cwd, file);
+    if (regex.test(file)) valid.push(file);
   }
-  return null;
+
+  if (valid.length === 0) return null;
+
+  // sort the versions and return the latest one.
+  valid.sort(isGreaterThan);
+  return join(cwd, valid[0]);
 }
+
+function extractVersion(viaProxyPath: string): string {
+  const filename = viaProxyPath.split("/").pop()!;
+  const version = filename.split("-")[1].split(".jar")[0];
+  return version;
+}
+
+
+function isGreaterThan(src: string, test: string): number {
+  const srcArr = src.split(".").map((x) => parseInt(x));
+  const testArr = test.split(".").map((x) => parseInt(x));
+
+  for (let i = 0; i < srcArr.length; i++) {
+    if (srcArr[i] > testArr[i]) return 1;
+    if (srcArr[i] < testArr[i]) return -1;
+  }
+
+  return 0;
+}
+
 
 function geyserAvailable(cwd: string): string | null {
   // don't match the +java8 part, as it's optional.
@@ -66,16 +92,82 @@ function geyserAvailable(cwd: string): string | null {
   return null;
 }
 
-async function getViaProxyJarVersion(use8 = false): Promise<{ version: string; filename: string }> {
-  const resp = await fetch(`${BASE_VIAPROXY_URL}/releases/latest`);
+async function getViaProxyJarVersion(use8 = false): Promise<{ version: string; snapshot: boolean, filename: string }> {
+  const req = await fetch(BASE_VIAPROXY_URL);
+  const html = await req.text();
 
-  // follow the redirect to get the latest release
-  // hardcode-y, but it'll work.
 
-  const version = resp.url.split("/").pop()!.substring(1);
 
-  const filename = "ViaProxy-" + version + (use8 ? "+java8" : "") + ".jar";
-  return { version, filename };
+  const versions = html.match(/ViaProxy-([0-9.]+)/);
+  if (versions == null) {
+    throw new Error("Failed to get ViaProxy version.");
+  }
+  const version = versions[1];
+  const snapshot = html.includes('SNAPSHOT');
+
+  // build filename
+  let filename = 'ViaProxy-';
+  filename += version;
+  filename += snapshot ? '-SNAPSHOT' : '-RELEASE';
+  filename += use8 ? '+java8' : '';
+  filename += '.jar';
+
+  return { version, snapshot, filename };
+}
+
+
+export async function getSupportedMCVersions(javaLoc: string, cwd: string, filename: string): Promise<string[]> {
+  // run the jar file to get the supported versions.
+  const test = exec(`${VIA_PROXY_CMD(javaLoc, filename, true)} --list-versions`, { cwd: cwd });
+
+  let versions: string[] = [];
+
+  // read from stdout
+
+  let seeStartVersions = false;
+
+
+  await new Promise<void>((resolve, reject) => {
+    let stdOutListener =  (data: string) => {
+      const strData = data.toString();
+      if (!strData.includes("===") && !seeStartVersions) return;
+      else if (strData.includes("===") && seeStartVersions) {
+        test.stdout?.removeListener("data", stdOutListener);
+        test.stderr?.removeListener("data", stdErrListener);
+        resolve();
+        return;
+      }
+  
+      if (strData.includes("===")) {
+        seeStartVersions = true;
+        return;
+      }
+  
+      // \x1B[34m[13:52:06]\x1B[m \x1B[32m[main/INFO]\x1B[m \x1B[36m(ViaProxy)\x1B[m \x1B[0m1.20.2\n\x1B[m
+      // get 1.20.2
+      const split = strData.split("\x1B[0m")
+      const version = split[split.length - 1].split('\n')[0]
+      versions.push(version);
+      // resolve();
+    }
+  
+    let stdErrListener = (data: string) => {
+      console.error(data.toString());
+      test.stdout?.removeListener("data", stdOutListener);
+      test.stderr?.removeListener("data", stdErrListener);
+      reject();
+      return;
+    }
+
+    if (test.stdout != null) {
+      test.stdout.on("data", stdOutListener);
+    }
+
+    if (test.stderr != null) {
+      test.stderr.on("data", stdErrListener);
+    }
+  });
+  return versions;
 }
 
 async function getGeyserJarVersion(): Promise<{ version: string; filename: string }> {
@@ -98,7 +190,7 @@ async function getGeyserJarVersion(): Promise<{ version: string; filename: strin
  * @returns {Promise<string>} the path to the downloaded ViaProxy jar
  */
 export async function fetchViaProxyJar(path: string, version: string, filename: string): Promise<string | void> {
-  const url = `${BASE_VIAPROXY_URL}/releases/download/v${version}/${filename}`;
+  const url = `${BASE_VIAPROXY_URL}/artifact/build/libs/${filename}`;
 
   const resp2 = await fetch(url);
 
@@ -169,12 +261,24 @@ export async function verifyViaProxyLoc(cwd: string, autoUpdate = true, javaLoc:
     if (autoUpdate) {
       const testLoc = join(cwd, filename);
       if (existsSync(testLoc)) {
-        debug("ViaProxy jar already exists, skipping download.");
-        return testLoc;
+        if (isGreaterThan(extractVersion(testLoc), version) >= 0) {
+          debug(`Found version  ${extractVersion(testLoc)} of ViaProxy, which is good enough. Skipping download.`);
+          return testLoc;
+        } else {
+          debug("Found older version of ViaProxy. Deleting.");
+          unlinkSync(testLoc);
+        }
       } else {
         const available = viaProxyAvailable(cwd);
+        console.log(available)
         if (available) {
-          unlinkSync(available);
+          if (isGreaterThan(extractVersion(available), version) >= 0) {
+            debug(`Found version ${extractVersion(available)} of ViaProxy, which is good enough. Skipping download.`);
+            return available
+          } else {
+            debug(`Found older version of ViaProxy. Deleting and installing newer.`);
+            unlinkSync(available);
+          }
         }
       }
     }
@@ -244,7 +348,7 @@ export async function checkJavaVersion(javaLoc: string): Promise<number> {
 }
 
 export async function openViaProxyGUI(javaLoc: string, fullpath: string, cwd: string) {
-  console.log("opening ViaProxy. Simply close the window when you're done to allow the code to continue.");
+  console.log("opening ViaProxy. This is done to add your account.\nSimply close the window when you're done to allow the mineflayer code to continue.");
 
   const test = exec(VIA_PROXY_CMD(javaLoc, fullpath, false), { cwd: cwd });
 
@@ -333,7 +437,8 @@ export async function identifyAccount(
           return await identifyAccount(username, bedrock, javaLoc, location, wantedCwd, depth + 1);
         }
 
-        const idx = accounts.findIndex((acc) => acc.bedrockSession.mcChain.displayName === username);
+        // console.log(accounts.map(acc => acc.bedrockSession.mcChain.displayName))
+        const idx = accounts.findIndex((acc) => acc.bedrockSession?.mcChain.displayName === username);
         return idx;
       } else {
         if (msAccNames.length === 0 || !msAccNames.includes(username)) {
@@ -345,7 +450,7 @@ export async function identifyAccount(
           return await identifyAccount(username, bedrock, javaLoc, location, wantedCwd, depth + 1);
         }
 
-        const idx = accounts.findIndex((acc) => acc.javaSession.mcProfile.name === username);
+        const idx = accounts.findIndex((acc) => acc.javaSession?.mcProfile.name === username);
         return idx;
       }
     }

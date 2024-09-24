@@ -9,6 +9,7 @@ import {
   configureGeyserConfig,
   fetchViaProxyJar,
   findOpenPort,
+  getSupportedMCVersions,
   identifyAccount,
   loadProxySaves,
   openViaProxyGUI,
@@ -51,7 +52,8 @@ export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot =
       host: options.host, // external host
       port: options.port, // external port
     });
-    ver = `Bedrock ${test.version}`;
+
+    ver = `Bedrock ${test.version}`;//`Bedrock ${test.version}`;
     useViaProxy = true;
 
   } else {
@@ -128,10 +130,22 @@ export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot =
     // perform ViaProxy setup.
     let cmd = VIA_PROXY_CMD(javaLoc, location);
     cmd = cmd + " --target-address " + `${rHost}:${rPort}`;
-    // cmd = cmd + " --target-version " + `"${ver}"` // comment to auto detect version
     cmd = cmd + " --bind-address " + `127.0.0.1:${port}`;
     cmd = cmd + " --auth-method " + auth;
     cmd = cmd + " --proxy-online-mode " + "false";
+
+    if (bedrock) {
+
+          // for now, we'll just assume latest bedrock version.
+          const supported = await getSupportedMCVersions(javaLoc, wantedCwd, location)
+          const latestBedrock = supported.find((x) => x.includes("Bedrock"));
+          if (latestBedrock == null) {
+            throw new Error("Failed to find latest Bedrock version.");
+          }
+
+          debug(`Latest Bedrock supported by ViaProxy version is ${latestBedrock}. Using it.`)
+          cmd = cmd + " --target-version " + `"${latestBedrock}"` // comment to auto detect version
+    }
 
     const newOpts = { ...options };
     // here is where we know we need to initialize ViaProxy.
