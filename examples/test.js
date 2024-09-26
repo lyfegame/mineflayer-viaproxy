@@ -6,15 +6,14 @@ const {createBot, AuthType} = require('../');
         host: process.argv[2],
         port: parseInt(process.argv[3]),
         username: process.argv[4] ?? "viaproxytest",
-        // bedrock: true,
-        auth: "offline",
-        localAuth: AuthType.OPENAUTHMOD,
-        profilesFolder: "./profiles",
+        viaProxyStderrCb: (data) => console.log(data.toString()),
+        viaProxyStdoutCb: (data) => console.log(data.toString()),
     })
     
-    bot.on("spawn", () => {
+    bot.on("spawn", async () => {
         console.log("Bot spawned");
-        bot.chat("Hello world!");
+        await bot.waitForTicks(20);
+        bot.chat("hi");
     });
 
     bot.on('chat', (username, message) => {

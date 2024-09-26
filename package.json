@@ -20,7 +20,9 @@
   },
   "resolutions": {
     "prismarine-registry": "git+https://github.com/GenerelSchwerz/prismarine-registry#mc-prefix-fix"
+   
   },
+
   "scripts": {
     "build": "tsc",
     "prepublish": "npm run build"
