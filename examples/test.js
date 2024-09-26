@@ -1,4 +1,4 @@
-const {createBot} = require('../');
+const {createBot, AuthType} = require('../');
 
 
 (async () => {
@@ -6,7 +6,9 @@ const {createBot} = require('../');
         host: process.argv[2],
         port: parseInt(process.argv[3]),
         username: process.argv[4] ?? "viaproxytest",
-        bedrock: true,
+        // bedrock: true,
+        auth: "offline",
+        localAuth: AuthType.OPENAUTHMOD,
         profilesFolder: "./profiles",
     })
     

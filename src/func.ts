@@ -5,19 +5,9 @@ import { supportedVersions } from "minecraft-data";
 import { spawn } from "child_process";
 import { AuthType, ViaProxyOpts } from "./types";
 import { openAuthLogin } from "./openAuthMod";
-import {
-  configureGeyserConfig,
-  fetchViaProxyJar,
-  findOpenPort,
-  getSupportedMCVersions,
-  identifyAccount,
-  loadProxySaves,
-  openViaProxyGUI,
-  verifyGeyserLoc,
-  verifyViaProxyLoc,
-} from "./utils";
+import { findOpenPort, getSupportedMCVersions, identifyAccount, verifyViaProxyLoc } from "./utils";
 import path from "path";
-import { existsSync, mkdir, mkdirSync } from "fs";
+import { existsSync, mkdirSync } from "fs";
 
 import "prismarine-registry";
 import { VIA_PROXY_CMD } from "./constants";
@@ -53,9 +43,8 @@ export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot =
       port: options.port, // external port
     });
 
-    ver = `Bedrock ${test.version}`;//`Bedrock ${test.version}`;
+    ver = `Bedrock ${test.version}`; //`Bedrock ${test.version}`;
     useViaProxy = true;
-
   } else {
     const test = await ping({
       host: options.host, // external host
@@ -75,13 +64,13 @@ export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot =
       debug(`Failed to match version from ${ver}!`);
     } else {
       const sorted = match.sort(cmpVersions);
-      debug(`Detected versions [${sorted.join(', ')}] from "${ver}".`)
-      ver = sorted[0]
+      debug(`Detected versions [${sorted.join(", ")}] from "${ver}".`);
+      ver = sorted[0];
 
       // if any version is greater than current latest version
       let higherVerDetected = false;
       for (const v of sorted) {
-        const cmp = cmpVersions(v, currentLatestVersion)
+        const cmp = cmpVersions(v, currentLatestVersion);
         if (cmp < 0) {
           higherVerDetected = true;
         } else if (cmp === 0) {
@@ -90,7 +79,7 @@ export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot =
         } else if (higherVerDetected) {
           // we found a lower version and a higher version, meaning multiple versions are supported.
           // this means we don't need viaProxy.
-          debug(`Multi-version detected. Using latest version ${currentLatestVersion}.`)
+          debug(`Multi-version detected. Using latest version ${currentLatestVersion}.`);
           ver = currentLatestVersion;
           break;
         }
@@ -100,12 +89,10 @@ export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot =
     }
   }
 
-
   let bot!: Bot;
 
-  if (useViaProxy) {
-
-    debug(`ViaProxy is needed for version ${ver}. Launching it.`)
+  if (useViaProxy || true) {
+    debug(`ViaProxy is needed for version ${ver}. Launching it.`);
 
     const cleanupProxy = () => {
       if (bot != null && bot.viaProxy != null && !bot.viaProxy.killed) {
@@ -125,9 +112,7 @@ export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot =
     const rHost = options.host ?? "127.0.0.1";
     const rPort = options.port ?? 25565;
     const port = options.localPort ?? (await findOpenPort());
-    const auth = options.localAuth ?? ((options.auth !== "offline" || !options.auth) ? AuthType.ACCOUNT : AuthType.NONE); // TODO maybe OPENAUTHMOD if we support by default?
-
-
+    const auth = options.localAuth ?? (options.auth !== "offline" || !options.auth ? AuthType.ACCOUNT : AuthType.NONE); // TODO maybe OPENAUTHMOD if we support by default?
 
     // perform ViaProxy setup.
     let cmd = VIA_PROXY_CMD(javaLoc, location);
@@ -137,16 +122,15 @@ export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot =
     cmd = cmd + " --proxy-online-mode " + "false";
 
     if (bedrock) {
+      // for now, we'll just assume latest bedrock version.
+      const supported = await getSupportedMCVersions(javaLoc, wantedCwd, location);
+      const latestBedrock = supported.find((x) => x.includes("Bedrock"));
+      if (latestBedrock == null) {
+        throw new Error("Failed to find latest Bedrock version.");
+      }
 
-          // for now, we'll just assume latest bedrock version.
-          const supported = await getSupportedMCVersions(javaLoc, wantedCwd, location)
-          const latestBedrock = supported.find((x) => x.includes("Bedrock"));
-          if (latestBedrock == null) {
-            throw new Error("Failed to find latest Bedrock version.");
-          }
-
-          debug(`Latest Bedrock supported by ViaProxy version is ${latestBedrock}. Using it.`)
-          cmd = cmd + " --target-version " + `"${latestBedrock}"` // comment to auto detect version
+      debug(`Latest Bedrock supported by ViaProxy version is ${latestBedrock}. Using it.`);
+      cmd = cmd + " --target-version " + `"${latestBedrock}"`; // comment to auto detect version
     }
 
     const newOpts = { ...options };
@@ -181,7 +165,7 @@ export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot =
           viaProxy!.stdout.removeListener("data", stdOutListener);
           viaProxy!.stderr.removeListener("data", stdErrListener);
           setTimeout(() => {
-            debug("Creating bot after ViaProxy started.");
+            debug(`Launching bot on version ${newOpts.version} with ViaProxy.`);
             bot = oCreateBot(newOpts);
             bot.on("end", cleanupProxy);
             openAuthLogin(bot).then(resolve);
