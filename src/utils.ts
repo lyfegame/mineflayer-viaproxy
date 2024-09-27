@@ -40,6 +40,8 @@ export async function findOpenPort(): Promise<number> {
   });
 }
 
+
+
 function viaProxyAvailable(cwd: string, use8: boolean): string | null {
   // don't match the +java8 part, as it's optional.
   // ViaProxy-3.3.4-SNAPSHOT.jar

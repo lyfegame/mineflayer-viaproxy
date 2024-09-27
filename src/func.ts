@@ -14,6 +14,8 @@ import { VIA_PROXY_CMD } from "./constants";
 
 const debug = require("debug")("mineflayer-viaproxy");
 
+const currentLatestVersion = supportedVersions.pc[supportedVersions.pc.length - 1]; // latest version;
+
 /**
  * sort for newest version first.
  */
@@ -29,65 +31,92 @@ const cmpVersions = (first: string, second: string) => {
   return 0;
 };
 
-export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot = orgCreateBot) {
-  let ver: string;
-  let useViaProxy = false;
+async function detectVersion(host: string | undefined, port: number | undefined) {
+  // try java first, then bedrock
 
-  const currentLatestVersion = supportedVersions.pc[supportedVersions.pc.length - 1]; // latest version;
-  const bedrock = options.bedrock ?? false;
+  let ver;
+  let bedrock = false;
 
-  if (bedrock) {
-    if (options.host == null || options.port == null) throw new Error("Host and port must be provided for bedrock edition.");
-    const test = await bdPing({
-      host: options.host, // external host
-      port: options.port, // external port
-    });
+  host = host ?? "127.0.0.1";
 
-    ver = `Bedrock ${test.version}`; //`Bedrock ${test.version}`;
-    useViaProxy = true;
-  } else {
+  try {
     const test = await ping({
-      host: options.host, // external host
-      port: options.port, // external port
+      host: host,
+      port: port ?? 25565,
+      closeTimeout: 5000,
     });
 
+    debug(`Server "${host}:${port}" is Java.`)
     if (test.version instanceof String) {
       ver = test.version as string;
     } else {
       ver = (test.version as { name: string }).name;
     }
+  } catch (err: any) {
 
-    const regex = /1\.\d+(\.\d+)?/g;
-    const match = ver.match(regex);
+    // the server was pinged, but attempt of TCP failed on this port. attempt UDP.
+    if (err.code === "ECONNREFUSED") {
+      // bedrock
 
-    if (match == null) {
-      debug(`Failed to match version from ${ver}!`);
+      bedrock = true;
+
+      // allow this to error.
+      const test = await bdPing({
+        host: host,
+        port: port ?? 19132,
+      });
+
+      debug(`Server "${host}:${port}" is Bedrock.`)
+      ver = test.version;
     } else {
-      const sorted = match.sort(cmpVersions);
-      debug(`Detected versions [${sorted.join(", ")}] from "${ver}".`);
-      ver = sorted[0];
-
-      // if any version is greater than current latest version
-      let higherVerDetected = false;
-      for (const v of sorted) {
-        const cmp = cmpVersions(v, currentLatestVersion);
-        if (cmp < 0) {
-          higherVerDetected = true;
-        } else if (cmp === 0) {
-          ver = v;
-          break;
-        } else if (higherVerDetected) {
-          // we found a lower version and a higher version, meaning multiple versions are supported.
-          // this means we don't need viaProxy.
-          debug(`Multi-version detected. Using latest version ${currentLatestVersion}.`);
-          ver = currentLatestVersion;
-          break;
-        }
-      }
-
-      useViaProxy = !supportedVersions.pc.includes(ver);
+      throw err;
     }
   }
+
+  if (ver == null) {
+    throw new Error("Failed to detect version.");
+  }
+
+  const regex = /1\.\d+(\.\d+)?/g;
+  const match = ver.match(regex);
+
+  if (match == null) {
+    debug(`Failed to match version from ${ver}!`);
+  } else {
+    const sorted = match.sort(cmpVersions);
+    debug(`Detected versions [${sorted.join(", ")}] from "${ver}".`);
+    ver = sorted[0];
+
+    // if any version is greater than current latest version
+    let higherVerDetected = false;
+    for (const v of sorted) {
+      const cmp = cmpVersions(v, currentLatestVersion);
+      if (cmp < 0) {
+        higherVerDetected = true;
+      } else if (cmp === 0) {
+        ver = v;
+        break;
+      } else if (higherVerDetected) {
+        // we found a lower version and a higher version, meaning multiple versions are supported.
+        // this means we don't need viaProxy.
+        debug(`Multi-version detected. Using latest version ${currentLatestVersion}.`);
+        ver = currentLatestVersion;
+        break;
+      }
+    }
+  }
+
+  if (bedrock) {
+    ver = `Bedrock ${ver}`;
+  }
+
+  return { ver, bedrock };
+}
+
+export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot = orgCreateBot) {
+  let useViaProxy = false;
+
+  const { ver, bedrock } = await detectVersion(options.host, options.port);
 
   let bot!: Bot;
 
