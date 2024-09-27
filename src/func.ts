@@ -129,6 +129,8 @@ export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot =
 
   const { ver, bedrock } = await detectVersion(options.host, options.port);
 
+  useViaProxy = bedrock || !supportedVersions.pc.includes(ver);
+
   let bot!: Bot;
 
   if (useViaProxy || true) {
