@@ -1,6 +1,6 @@
 {
   "name": "mineflayer-viaproxy",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "ViaProxy support for mineflayer.",
   "main": "dist/index.js",
   "author": "GenerelSchwerz",
@@ -20,9 +20,7 @@
   },
   "resolutions": {
     "prismarine-registry": "git+https://github.com/GenerelSchwerz/prismarine-registry#mc-prefix-fix"
-   
   },
-
   "scripts": {
     "build": "tsc",
     "prepublish": "npm run build"
