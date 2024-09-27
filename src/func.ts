@@ -39,6 +39,16 @@ async function detectVersion(host: string | undefined, port: number | undefined)
 
   host = host ?? "127.0.0.1";
 
+
+  if (typeof host !== "string") {
+    throw new Error(`Host must be a string, got ${typeof host}.`);
+  }
+
+  if (port != null && typeof port !== "number") {
+    throw new Error(`Port must be a number, got ${typeof port}.`);
+  }
+
+
   try {
     const test = await ping({
       host: host,
@@ -61,6 +71,7 @@ async function detectVersion(host: string | undefined, port: number | undefined)
       bedrock = true;
 
       // allow this to error.
+      // NOTE: This fails on LAN due to LAN using Nethernet, not Raknet.
       const test = await bdPing({
         host: host,
         port: port ?? 19132,
