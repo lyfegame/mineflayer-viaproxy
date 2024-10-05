@@ -5,6 +5,7 @@ const {createBot} = require('../');
     const bot = await createBot({
         host: process.argv[2],
         port: parseInt(process.argv[3]),
+        auth: "offline",
         username: process.argv[4] ?? "viaproxytest",
         // viaProxyStderrCb: (data) => console.log(data.toString()),
         // viaProxyStdoutCb: (data) => console.log(data.toString()),

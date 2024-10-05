@@ -13,6 +13,8 @@ Alternatively, [here](https://discord.gg/prismarinejs-413438066984747026) for ge
 # NOTICE
 Because mineflayer currently doesn't support ViaProxy due to an error in prismarine-registry (see [here](https://github.com/PrismarineJS/prismarine-registry/pull/39)), you must use the patched version of prismarine-registry.
 
+This is the `TypeError: Cannot read properties of undefined (reading 'overworld')` error in `plugins/game.js` for mineflayer.
+
 To do this, you must add the following to your package.json:
 
 ```json
@@ -23,7 +25,7 @@ To do this, you must add the following to your package.json:
 ```
 
 # NOTICE 2
-This plugin does not work with Python, due to JSPYBridge breaking internally. It is not my fault, as far as I know, and I do not know why.
+This plugin does not work with Python due to JSPYBridge not having the ability to change the resolutions for libraries. I cannot do anything about this.
 
 ### TODOS
 - [x] Support bedrock versions
