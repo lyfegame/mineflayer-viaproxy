@@ -66,6 +66,9 @@ async function detectVersion(host: string | undefined, port: number | undefined)
     } else {
       ver = (test.version as { name: string }).name;
     }
+
+    host = host1;
+    port = port1;
   } catch (err: any) {
     // the server was pinged, but attempt of TCP failed on this port. attempt UDP.
     if (err.code === "ECONNREFUSED") {
@@ -87,6 +90,8 @@ async function detectVersion(host: string | undefined, port: number | undefined)
 
       debug(`Server "${host}:${port}" is Bedrock.`);
       ver = test.version;
+      host = host1;
+      port = port1;
     } else {
       throw err;
     }
@@ -129,13 +134,13 @@ async function detectVersion(host: string | undefined, port: number | undefined)
     ver = `Bedrock ${ver}`;
   }
 
-  return { ver, bedrock };
+  return { host, port, ver, bedrock };
 }
 
 export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot = orgCreateBot) {
   let useViaProxy = false;
 
-  const { ver, bedrock } = await detectVersion(options.host, options.port);
+  const { host: rHost, port: rPort, ver, bedrock } = await detectVersion(options.host, options.port);
 
   useViaProxy = bedrock || !supportedVersions.pc.includes(ver);
 
@@ -159,8 +164,6 @@ export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot =
     const javaLoc = options.javaPath ?? "java";
     const location = await verifyViaProxyLoc(wantedCwd, options.autoUpdate, javaLoc, options.viaProxyLocation);
 
-    const rHost = options.host ?? "127.0.0.1";
-    const rPort = options.port ?? 25565;
     const port = options.localPort ?? (await findOpenPort());
     const auth = options.localAuth ?? (options.auth !== "offline" || !options.auth ? AuthType.ACCOUNT : AuthType.NONE); // TODO maybe OPENAUTHMOD if we support by default?
 
