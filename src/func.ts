@@ -39,7 +39,6 @@ async function detectVersion(host: string | undefined, port: number | undefined)
 
   host = host ?? "127.0.0.1";
 
-
   if (typeof host !== "string") {
     throw new Error(`Host must be a string, got ${typeof host}.`);
   }
@@ -48,36 +47,45 @@ async function detectVersion(host: string | undefined, port: number | undefined)
     throw new Error(`Port must be a number, got ${typeof port}.`);
   }
 
-
   try {
+    const port1 = port ?? 25565;
+    const host1 = host ?? "127.0.0.1";
+
+    if (host == null) debug(`Host not provided. Defaulting to ${host1}.`);
+    if (port == null) debug(`Port not provided. Defaulting to ${port1}.`);
+
     const test = await ping({
-      host: host,
-      port: port ?? 25565,
+      host: host1,
+      port: port1,
       closeTimeout: 5000,
     });
 
-    debug(`Server "${host}:${port}" is Java.`)
+    debug(`Server "${host1}:${port1}" is Java.`);
     if (test.version instanceof String) {
       ver = test.version as string;
     } else {
       ver = (test.version as { name: string }).name;
     }
   } catch (err: any) {
-
     // the server was pinged, but attempt of TCP failed on this port. attempt UDP.
     if (err.code === "ECONNREFUSED") {
       // bedrock
 
       bedrock = true;
+      const port1 = port ?? 19132;
+      const host1 = host ?? "127.0.0.1";
+
+      if (host == null) debug(`Host not provided. Defaulting to ${host1}.`);
+      if (port == null) debug(`Port not provided. Defaulting to ${port1}.`);
 
       // allow this to error.
       // NOTE: This fails on LAN due to LAN using Nethernet, not Raknet.
       const test = await bdPing({
-        host: host,
-        port: port ?? 19132,
+        host: host1,
+        port: port1,
       });
 
-      debug(`Server "${host}:${port}" is Bedrock.`)
+      debug(`Server "${host}:${port}" is Bedrock.`);
       ver = test.version;
     } else {
       throw err;
@@ -133,7 +141,7 @@ export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot =
 
   let bot!: Bot;
 
-  if (useViaProxy || true) {
+  if (useViaProxy) {
     debug(`ViaProxy is needed for version ${ver}. Launching it.`);
 
     const cleanupProxy = () => {
