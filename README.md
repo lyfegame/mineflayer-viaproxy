@@ -15,10 +15,17 @@ Because mineflayer currently doesn't support ViaProxy due to an error in prismar
 
 This is the `TypeError: Cannot read properties of undefined (reading 'overworld')` error in `plugins/game.js` for mineflayer.
 
-To do this, you must add the following to your package.json:
+To do this, the fix below must be added to your JSON. *It is dependent on the dependency installer you are using.*:
 
 ```json
+// For npm:
+"overrides": {
+    "prismarine-registry": "git+https://github.com/GenerelSchwerz/prismarine-registry#mc-prefix-fix"
+}
+```
 
+```json
+// For yarn:
 "resolutions": {
     "prismarine-registry": "git+https://github.com/GenerelSchwerz/prismarine-registry#mc-prefix-fix"
 }
