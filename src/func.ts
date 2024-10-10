@@ -234,7 +234,7 @@ export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot =
         viaProxy!.stdout.removeListener("data", stdOutListener);
         viaProxy!.stderr.removeListener("data", stdErrListener);
         cleanupProxy();
-        reject(new Error("ViaProxy failed to start"));
+        reject(new Error(`ViaProxy failed to start: ${data.toString()}`));
       };
 
       viaProxy!.stdout.on("data", stdOutListener);
