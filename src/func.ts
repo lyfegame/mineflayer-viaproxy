@@ -211,10 +211,11 @@ export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot =
     process.on("beforeExit", cleanupProxy);
 
     await new Promise<void>((resolve, reject) => {
+      const errorBuffer: string[] = []; // Buffer to collect error messages
+    
       const stdOutListener = (data: string) => {
         if (data.includes("started successfully")) {
           debug("ViaProxy started successfully");
-
           viaProxy!.stdout.removeListener("data", stdOutListener);
           viaProxy!.stderr.removeListener("data", stdErrListener);
           setTimeout(() => {
@@ -224,18 +225,31 @@ export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot =
             openAuthLogin(bot).then(resolve);
           }, 1000);
         }
-
+    
         if (data.includes("main/WARN")) {
           const d = data.toString().split("[main/WARN]")[1].trim();
           debug(d);
         }
       };
+    
       const stdErrListener = (data: any) => {
-        viaProxy!.stdout.removeListener("data", stdOutListener);
-        viaProxy!.stderr.removeListener("data", stdErrListener);
-        cleanupProxy();
-        reject(new Error(`ViaProxy failed to start: ${data.toString()}`));
+        errorBuffer.push(data.toString()); // Accumulate error messages
       };
+          
+      // Capture process exit to handle errors
+      viaProxy!.on("close", (code: number) => {
+        if (code !== 0) {
+          // If the process didn't exit successfully, reject with all accumulated errors
+          const completeErrorMessage = errorBuffer.join('\n');
+          reject(new Error(`ViaProxy failed to start. Exit code: ${code}. Error log: \n${completeErrorMessage}`));
+        }
+      });
+    
+      viaProxy!.on("error", (err: any) => {
+        // In case of other errors, reject with the error and accumulated buffer
+        const completeErrorMessage = errorBuffer.join('\n');
+        reject(new Error(`ViaProxy encountered an error: ${err.message}. Error log: \n${completeErrorMessage}`));
+      });
 
       viaProxy!.stdout.on("data", stdOutListener);
       viaProxy!.stderr.on("data", stdErrListener);
