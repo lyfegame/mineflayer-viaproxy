@@ -10,29 +10,6 @@ Why? Because I'm tired of people asking for version updates.
 If you have issues, join [here](https://discord.gg/g3w4G88y) for support. 
 Alternatively, [here](https://discord.gg/prismarinejs-413438066984747026) for general mineflayer support.
 
-# NOTICE
-Because mineflayer currently doesn't support ViaProxy due to an error in prismarine-registry (see [here](https://github.com/PrismarineJS/prismarine-registry/pull/39)), you must use the patched version of prismarine-registry.
-
-This is the `TypeError: Cannot read properties of undefined (reading 'overworld')` error in `plugins/game.js` for mineflayer.
-
-To do this, the fix below must be added to your JSON. *It is dependent on the dependency installer you are using.*:
-
-```json
-// For npm:
-"overrides": {
-    "prismarine-registry": "git+https://github.com/GenerelSchwerz/prismarine-registry#mc-prefix-fix"
-}
-```
-
-```json
-// For yarn:
-"resolutions": {
-    "prismarine-registry": "git+https://github.com/GenerelSchwerz/prismarine-registry#mc-prefix-fix"
-}
-```
-
-# NOTICE 2
-This plugin does not work with Python due to JSPYBridge not having the ability to change the resolutions for libraries. I cannot do anything about this.
 
 ### TODOS
 - [x] Support bedrock versions
