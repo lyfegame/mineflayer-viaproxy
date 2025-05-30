@@ -14,10 +14,10 @@ Alternatively, [here](https://discord.gg/prismarinejs-413438066984747026) for ge
 ### TODOS
 - [x] Support bedrock versions
 - [x] Support adding accounts to ViaProxy gracefully.
-- [ ] Make fix for prismarine-registry more robust (see patches) 
+- [x] Make fix for prismarine-registry more robust (see patches) 
 - [ ] Add support for more ViaVersion options
 - [ ] Add support for more ViaProxy options
-- [ ] Support Python
+- [x] Support Python
 
 ## Installation
 
