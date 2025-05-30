@@ -16,6 +16,7 @@ const debug = require("debug")("mineflayer-viaproxy");
 
 const currentLatestVersion = supportedVersions.pc[supportedVersions.pc.length - 1]; // latest version;
 
+
 /**
  * sort for newest version first.
  */
@@ -142,11 +143,11 @@ async function detectVersion(host: string | undefined, port: number | undefined)
 }
 
 export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot = orgCreateBot) {
-  let useViaProxy = false;
+  let useViaProxy = options.forceViaProxy ?? false;
 
   const { host: rHost, port: rPort, ver, bedrock } = await detectVersion(options.host, options.port);
 
-  useViaProxy = bedrock || !supportedVersions.pc.includes(ver);
+  useViaProxy = useViaProxy || (bedrock || !supportedVersions.pc.includes(ver));
 
   let bot!: Bot;
 
@@ -159,6 +160,8 @@ export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot =
         delete bot.viaProxy; // this shouldn't be necessary, but why not.
       }
     };
+
+
 
     const wantedCwd = options.viaProxyWorkingDir ?? path.join(process.cwd(), "viaproxy");
 
@@ -177,6 +180,10 @@ export async function createBot(options: BotOptions & ViaProxyOpts, oCreateBot =
     cmd = cmd + " --bind-address " + `127.0.0.1:${port}`;
     cmd = cmd + " --auth-method " + auth;
     cmd = cmd + " --proxy-online-mode " + "false";
+
+    if (options.backendProxyUrl) {
+      cmd = cmd + " --backend-proxy-url " + options.backendProxyUrl;
+    }
 
     if (bedrock) {
       // for now, we'll just assume latest bedrock version.

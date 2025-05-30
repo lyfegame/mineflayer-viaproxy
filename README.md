@@ -66,6 +66,7 @@ enum AuthType {
 
 ```ts
 interface ViaProxyOpts {
+    forceViaProxy?: boolean;
     javaPath?: string;
     bedrock?: boolean;
     localPort?: number;
@@ -73,14 +74,15 @@ interface ViaProxyOpts {
     viaProxyLocation?: string;
     viaProxyWorkingDir?: string;
     autoUpdate?: boolean;
+    backendProxyUrl?: string;
     viaProxyStdoutCb?: (data: any) => void
     viaProxyStderrCb?: (data: any) => void
-
 }
 ```
 
 | Name | Type | Default | Description |
 |------|------|---------|-------------|
+| forceViaProxy | boolean | false | Whether or not to force the use of ViaProxy. If set to true, it will always use ViaProxy regardless of the server version. |
 | javaPath | string | "java" | The path to the java executable. |
 | bedrock | boolean | false | Whether or not to use the bedrock version of ViaProxy. |
 | localPort | number | *auto determined* | The port to listen on for the local server. If none is specified, it will automatically locate an open port for you on your computer. |
@@ -88,6 +90,7 @@ interface ViaProxyOpts {
 | viaProxyLocation | string | "" | The location of the ViaVersion proxy jar. If none specified, it will download automatically to the CWD + `viaproxy`. |
 | viaProxyWorkingDir | string | "" | The working directory for the ViaVersion proxy. If none specified, it will use the CWD + `viaproxy`. |
 | autoUpdate | boolean | true | Whether or not to automatically update the ViaVersion proxy. |
+| backendProxyUrl | string | "" | The URL of the backend proxy to connect to. If none specified, it will not use one. |
 | viaProxyStdoutCb | (data: any) => void | undefined | A callback for the stdout of the ViaVersion proxy. |
 | viaProxyStderrCb | (data: any) => void | undefined | A callback for the stderr of the ViaVersion proxy. |
 
