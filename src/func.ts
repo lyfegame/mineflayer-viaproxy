@@ -39,6 +39,10 @@ async function detectVersion(host: string | undefined, port: number | undefined)
 
   host = host ?? "127.0.0.1";
 
+  if ( port != null && isNaN(port)) {
+    port = undefined;
+  }
+
   if (typeof host !== "string") {
     throw new Error(`Host must be a string, got ${typeof host}.`);
   }

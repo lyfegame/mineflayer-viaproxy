@@ -8,18 +8,15 @@
   "devDependencies": {
     "@types/js-yaml": "^4.0.9",
     "mineflayer-viaproxy": "file:./",
-    "typescript": "^5.6.2"
+    "typescript": "^5.8.3"
   },
   "dependencies": {
-    "bedrock-protocol": "^3.40.0",
-    "debug": "^4.3.7",
+    "bedrock-protocol": "^3.45.0",
+    "debug": "^4.4.1",
     "js-yaml": "^4.1.0",
-    "minecraft-data": "^3.69.0",
-    "minecraft-protocol": "^1.47.0",
-    "mineflayer": "^4.20.1"
-  },
-  "resolutions": {
-    "prismarine-registry": "git+https://github.com/GenerelSchwerz/prismarine-registry#mc-prefix-fix"
+    "minecraft-data": "^3.89.0",
+    "minecraft-protocol": "^1.57.0",
+    "mineflayer": "^4.29.0"
   },
   "scripts": {
     "build": "tsc",
