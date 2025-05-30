@@ -1,0 +1,94 @@
+[14:50:44] [main/INFO] (ViaProxy) Initializing ViaProxy CLI v3.4.2-SNAPSHOT (git-ViaProxy-3.4.2-SNAPSHOT:e0b5abe) (Injected using Launcher Agent)...
+[14:50:44] [main/INFO] (ViaProxy) Using java version: OpenJDK 64-Bit Server VM 17.0.15 (Arch Linux) on Linux
+[14:50:44] [main/INFO] (ViaProxy) Available memory (bytes): 4114612224
+[14:50:44] [main/INFO] (ViaProxy) Working directory: /home/generel/Documents/code/typescript/mineflayer/mineflayer-viaproxy/examples
+[14:50:44] [main/DEBUG] (io.netty.util.internal.logging.InternalLoggerFactory) Using SLF4J as the default logging framework
+[14:50:44] [main/DEBUG] (io.netty.util.ResourceLeakDetector) -Dio.netty.leakDetection.level: simple
+[14:50:44] [main/DEBUG] (io.netty.util.ResourceLeakDetector) -Dio.netty.leakDetection.targetRecords: 4
+[14:50:44] [main/DEBUG] (io.netty.util.internal.PlatformDependent0) -Dio.netty.noUnsafe: false
+[14:50:44] [main/DEBUG] (io.netty.util.internal.PlatformDependent0) Java version: 17
+[14:50:44] [main/DEBUG] (io.netty.util.internal.PlatformDependent0) sun.misc.Unsafe.theUnsafe: available
+[14:50:44] [main/DEBUG] (io.netty.util.internal.PlatformDependent0) sun.misc.Unsafe base methods: all available
+[14:50:44] [main/DEBUG] (io.netty.util.internal.PlatformDependent0) sun.misc.Unsafe.storeFence: available
+[14:50:44] [main/DEBUG] (io.netty.util.internal.PlatformDependent0) java.nio.Buffer.address: available
+[14:50:44] [main/DEBUG] (io.netty.util.internal.PlatformDependent0) direct buffer constructor: unavailable
+java.lang.UnsupportedOperationException: Reflective setAccessible(true) disabled
+	at io.netty.util.internal.ReflectionUtil.trySetAccessible(ReflectionUtil.java:31) ~[ViaProxy-3.4.2-SNAPSHOT.jar:?]
+	at io.netty.util.internal.PlatformDependent0$5.run(PlatformDependent0.java:332) ~[ViaProxy-3.4.2-SNAPSHOT.jar:?]
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:318) ~[?:?]
+	at io.netty.util.internal.PlatformDependent0.<clinit>(PlatformDependent0.java:325) [ViaProxy-3.4.2-SNAPSHOT.jar:?]
+	at io.netty.util.internal.PlatformDependent.isAndroid(PlatformDependent.java:334) [ViaProxy-3.4.2-SNAPSHOT.jar:?]
+	at io.netty.util.internal.PlatformDependent.<clinit>(PlatformDependent.java:90) [ViaProxy-3.4.2-SNAPSHOT.jar:?]
+	at io.netty.util.ConstantPool.<init>(ConstantPool.java:34) [ViaProxy-3.4.2-SNAPSHOT.jar:?]
+	at io.netty.util.AttributeKey$1.<init>(AttributeKey.java:27) [ViaProxy-3.4.2-SNAPSHOT.jar:?]
+	at io.netty.util.AttributeKey.<clinit>(AttributeKey.java:27) [ViaProxy-3.4.2-SNAPSHOT.jar:?]
+	at net.raphimc.netminecraft.constants.MCPipeline.<clinit>(MCPipeline.java:42) [ViaProxy-3.4.2-SNAPSHOT.jar:?]
+	at net.raphimc.viaproxy.ViaProxy.loadNetty(ViaProxy.java:311) [ViaProxy-3.4.2-SNAPSHOT.jar:?]
+	at net.raphimc.viaproxy.ViaProxy.injectedMain(ViaProxy.java:212) [ViaProxy-3.4.2-SNAPSHOT.jar:?]
+	at net.raphimc.viaproxy.ViaProxy.main(ViaProxy.java:101) [ViaProxy-3.4.2-SNAPSHOT.jar:?]
+[14:50:44] [main/DEBUG] (io.netty.util.internal.PlatformDependent0) java.nio.Bits.unaligned: available, true
+[14:50:44] [main/DEBUG] (io.netty.util.internal.PlatformDependent0) jdk.internal.misc.Unsafe.allocateUninitializedArray(int): unavailable
+java.lang.IllegalAccessException: class io.netty.util.internal.PlatformDependent0$7 cannot access class jdk.internal.misc.Unsafe (in module java.base) because module java.base does not export jdk.internal.misc to unnamed module @650b0731
+	at java.base/jdk.internal.reflect.Reflection.newIllegalAccessException(Reflection.java:392) ~[?:?]
+	at java.base/java.lang.reflect.AccessibleObject.checkAccess(AccessibleObject.java:674) ~[?:?]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:561) ~[?:?]
+	at io.netty.util.internal.PlatformDependent0$7.run(PlatformDependent0.java:468) ~[ViaProxy-3.4.2-SNAPSHOT.jar:?]
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:318) ~[?:?]
+	at io.netty.util.internal.PlatformDependent0.<clinit>(PlatformDependent0.java:459) [ViaProxy-3.4.2-SNAPSHOT.jar:?]
+	at io.netty.util.internal.PlatformDependent.isAndroid(PlatformDependent.java:334) [ViaProxy-3.4.2-SNAPSHOT.jar:?]
+	at io.netty.util.internal.PlatformDependent.<clinit>(PlatformDependent.java:90) [ViaProxy-3.4.2-SNAPSHOT.jar:?]
+	at io.netty.util.ConstantPool.<init>(ConstantPool.java:34) [ViaProxy-3.4.2-SNAPSHOT.jar:?]
+	at io.netty.util.AttributeKey$1.<init>(AttributeKey.java:27) [ViaProxy-3.4.2-SNAPSHOT.jar:?]
+	at io.netty.util.AttributeKey.<clinit>(AttributeKey.java:27) [ViaProxy-3.4.2-SNAPSHOT.jar:?]
+	at net.raphimc.netminecraft.constants.MCPipeline.<clinit>(MCPipeline.java:42) [ViaProxy-3.4.2-SNAPSHOT.jar:?]
+	at net.raphimc.viaproxy.ViaProxy.loadNetty(ViaProxy.java:311) [ViaProxy-3.4.2-SNAPSHOT.jar:?]
+	at net.raphimc.viaproxy.ViaProxy.injectedMain(ViaProxy.java:212) [ViaProxy-3.4.2-SNAPSHOT.jar:?]
+	at net.raphimc.viaproxy.ViaProxy.main(ViaProxy.java:101) [ViaProxy-3.4.2-SNAPSHOT.jar:?]
+[14:50:44] [main/DEBUG] (io.netty.util.internal.PlatformDependent0) java.nio.DirectByteBuffer.<init>(long, {int,long}): unavailable
+[14:50:44] [main/DEBUG] (io.netty.util.internal.PlatformDependent) sun.misc.Unsafe: available
+[14:50:44] [main/DEBUG] (io.netty.util.internal.PlatformDependent) -Dio.netty.tmpdir: /tmp (java.io.tmpdir)
+[14:50:44] [main/DEBUG] (io.netty.util.internal.PlatformDependent) -Dio.netty.bitMode: 64 (sun.arch.data.model)
+[14:50:44] [main/DEBUG] (io.netty.util.internal.PlatformDependent) -Dio.netty.maxDirectMemory: -1 bytes
+[14:50:44] [main/DEBUG] (io.netty.util.internal.PlatformDependent) -Dio.netty.uninitializedArrayAllocationThreshold: -1
+[14:50:44] [main/DEBUG] (io.netty.util.internal.CleanerJava9) java.nio.ByteBuffer.cleaner(): available
+[14:50:44] [main/DEBUG] (io.netty.util.internal.PlatformDependent) -Dio.netty.noPreferDirect: false
+[14:50:44] [main/DEBUG] (io.netty.util.concurrent.GlobalEventExecutor) -Dio.netty.globalEventExecutor.quietPeriodSeconds: 1
+[14:50:44] [main/DEBUG] (io.netty.util.internal.InternalThreadLocalMap) -Dio.netty.threadLocalMap.stringBuilder.initialSize: 1024
+[14:50:44] [main/DEBUG] (io.netty.util.internal.InternalThreadLocalMap) -Dio.netty.threadLocalMap.stringBuilder.maxSize: 4096
+[14:50:44] [Via-Mappingloader-0/INFO] (ViaVersion) Loading block connection mappings ...
+[14:50:45] [main/INFO] (ViaBackwards) Loading translations...
+[14:50:45] [main/INFO] (ViaBackwards) Registering protocols...
+[14:50:45] [main/INFO] (ViaRewind) Registering protocols...
+[14:50:45] [main/DEBUG] (io.netty.channel.MultithreadEventLoopGroup) -Dio.netty.eventLoopThreads: 40
+[14:50:45] [main/DEBUG] (io.netty.channel.nio.NioEventLoop) -Dio.netty.noKeySetOptimization: false
+[14:50:45] [main/DEBUG] (io.netty.channel.nio.NioEventLoop) -Dio.netty.selectorAutoRebuildThreshold: 512
+[14:50:45] [main/DEBUG] (io.netty.util.internal.PlatformDependent) org.jctools-core.MpscChunkedArrayQueue: available
+[14:50:45] [main/DEBUG] (io.netty.channel.DefaultChannelId) -Dio.netty.processId: 432287 (auto-detected)
+[14:50:45] [main/DEBUG] (io.netty.util.NetUtil) -Djava.net.preferIPv4Stack: false
+[14:50:45] [main/DEBUG] (io.netty.util.NetUtil) -Djava.net.preferIPv6Addresses: false
+[14:50:45] [main/DEBUG] (io.netty.util.NetUtilInitializations) Loopback interface: lo (lo, 0:0:0:0:0:0:0:1%lo)
+[14:50:45] [main/DEBUG] (io.netty.util.NetUtil) /proc/sys/net/core/somaxconn: 4096
+[14:50:45] [main/DEBUG] (io.netty.channel.DefaultChannelId) -Dio.netty.machineId: 00:50:56:ff:fe:c0:00:08 (auto-detected)
+[14:50:45] [main/DEBUG] (io.netty.buffer.PooledByteBufAllocator) -Dio.netty.allocator.numHeapArenas: 40
+[14:50:45] [main/DEBUG] (io.netty.buffer.PooledByteBufAllocator) -Dio.netty.allocator.numDirectArenas: 40
+[14:50:45] [main/DEBUG] (io.netty.buffer.PooledByteBufAllocator) -Dio.netty.allocator.pageSize: 8192
+[14:50:45] [main/DEBUG] (io.netty.buffer.PooledByteBufAllocator) -Dio.netty.allocator.maxOrder: 9
+[14:50:45] [main/DEBUG] (io.netty.buffer.PooledByteBufAllocator) -Dio.netty.allocator.chunkSize: 4194304
+[14:50:45] [main/DEBUG] (io.netty.buffer.PooledByteBufAllocator) -Dio.netty.allocator.smallCacheSize: 256
+[14:50:45] [main/DEBUG] (io.netty.buffer.PooledByteBufAllocator) -Dio.netty.allocator.normalCacheSize: 64
+[14:50:45] [main/DEBUG] (io.netty.buffer.PooledByteBufAllocator) -Dio.netty.allocator.maxCachedBufferCapacity: 32768
+[14:50:45] [main/DEBUG] (io.netty.buffer.PooledByteBufAllocator) -Dio.netty.allocator.cacheTrimInterval: 8192
+[14:50:45] [main/DEBUG] (io.netty.buffer.PooledByteBufAllocator) -Dio.netty.allocator.cacheTrimIntervalMillis: 0
+[14:50:45] [main/DEBUG] (io.netty.buffer.PooledByteBufAllocator) -Dio.netty.allocator.useCacheForAllThreads: false
+[14:50:45] [main/DEBUG] (io.netty.buffer.PooledByteBufAllocator) -Dio.netty.allocator.maxCachedByteBuffersPerChunk: 1023
+[14:50:45] [main/DEBUG] (io.netty.buffer.PooledByteBufAllocator) -Dio.netty.allocator.disableCacheFinalizersForFastThreadLocalThreads: false
+[14:50:45] [main/DEBUG] (io.netty.buffer.ByteBufUtil) -Dio.netty.allocator.type: pooled
+[14:50:45] [main/DEBUG] (io.netty.buffer.ByteBufUtil) -Dio.netty.threadLocalDirectBufferSize: 0
+[14:50:45] [main/DEBUG] (io.netty.buffer.ByteBufUtil) -Dio.netty.maxThreadLocalCharBufferSize: 16384
+[14:50:45] [main/DEBUG] (io.netty.bootstrap.ChannelInitializerExtensions) -Dio.netty.bootstrap.extensions: null
+[14:50:45] [main/INFO] (ViaBedrock) Started resource pack HTTP server on http://127.0.0.1:42421/
+[14:50:45] [main/INFO] (ViaVersion) ViaVersion detected lowest supported version by the proxy: 1.7.2-1.7.5 (4)
+[14:50:45] [main/INFO] (ViaVersion) Highest supported version by the proxy: 1.21.5 (770)
+[14:50:45] [main/WARN] (ViaVersion) Please update your Java runtime to at least Java 21 (your version is 17.0.15).
+[14:50:45] [main/WARN] (ViaVersion) At some point in the future, ViaVersion will no longer be compatible with this version of Java.
+[14:50:45] [main/INFO] (ViaProxy) For a more detailed description of the options, please refer to the viaproxy.yml file.
