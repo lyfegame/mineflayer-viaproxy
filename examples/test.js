@@ -8,6 +8,7 @@ const {createBot} = require('../');
         auth: "offline",
         username: process.argv[4] ?? "viaproxytest",
         forceViaProxy: true,
+        // backendProxyUrl: "socks5://vyrhcaww:dwnbbhgoewtt@82.27.247.251:5585"
 
         // viaProxyStderrCb: (data) => console.log(data.toString()),
         // viaProxyStdoutCb: (data) => console.log(data.toString()),
